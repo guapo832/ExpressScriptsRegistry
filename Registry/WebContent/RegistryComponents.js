@@ -1,22 +1,27 @@
-var registries = [{test:1},{test:2}]
+var registries = [{scope:"scope1"},
+                  {scope:"scope2"},
+                  {scope:"scope2/scope1"},
+                  {scope:"scope2/scope2"}];
 
 var RegistryApplication = React.createClass({
   render: function() {
-    return  <div><RegistryFilter/><RegistryScopeList/></div>
+    return  <div><RegistryFilter/><RegistryScopeList data={this.props.data}/></div>
   }
 });
 
 var RegistryScopeList = React.createClass({
 	render: function(){
+		var RegistryEntries= this.props.data.map(function(regentry) {
+		      return (
+		    		  
+		    	        <RegistryScope data={regentry} idx={regentry.scope.replace(/\//g,'_')}/>
+		    	          
+		    	      );
+		    	    });
+
 		return <div className="panel-group" id="accordion">
-		  <RegistryScope title="/scope1" idx="1">
-            
-		  </RegistryScope>
-		     
-		  
-	      <RegistryScope title="/scope2" idx="2"/>
-	   
-	    </div>
+		      {RegistryEntries}		      
+	  	    </div>
 			
 	}
 });
@@ -42,32 +47,52 @@ var RegistryScope = React.createClass({
 		
 	   
 		var id = this.props.idx;
+		var editid = this.props.idx + "edit";
 	    var datatarget= "#" + id;
+	    var dataedittarget="#" + id + "edit";
 	    
 		
 	    
 		return <div className="panel panel-primary">
         <div className="panel-heading">
         <h4 className="panel-title">
-          <span data-toggle="collapse" data-parent="#accordion" data-target={datatarget}>{this.props.title}</span>
+          <span data-toggle="collapse" data-parent="#accordion" data-target={datatarget}>{this.props.data.scope}</span>
+          <span data-toggle="collapse" data-parent="#accordion" data-target={dataedittarget} className="pull-right">edit</span>
         </h4>
       </div>
-      <div id={id} className="panel-collapse collapse">
-        <div className="panel-body">
-           some scope data here.
-           <div className="panel-group" id="accordion">
-           {this.props.children}
-           </div>
-	      </div>
-      </div>
+      <RegistryEntryRead id={id} data={this.props.data} title={this.props.data.scope}/>
+      <RegistryEntryUpdate id={editid} data={this.props.data} title={this.props.data.scope}/>
   </div>
 	}
 });
 
 
+var RegistryEntryUpdate = React.createClass({
+	  render: function() {
+	    return  <div id={this.props.id} className="panel-collapse collapse">
+	    <div className="panel-body">
+	    edit form here.
+	    </div>
+	</div>  
+
+	  }
+	});
+
+
+
+var RegistryEntryRead = React.createClass({
+  render: function() {
+    return  <div id={this.props.id} className="panel-collapse collapse">
+    <div className="panel-body">
+    read form here.
+    </div>
+</div>  
+
+  }
+});
 
   ReactDOM.render(
-    <RegistryApplication/>,
+    <RegistryApplication data={registries}/>,
     document.getElementById('registrycontainer')
   );
 
