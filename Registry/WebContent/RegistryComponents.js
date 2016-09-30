@@ -44,7 +44,9 @@ var modalStyle = {
 
 
 
-
+      var inlineStyle={
+			display:"inline"
+		}
 
 
 
@@ -75,179 +77,31 @@ function convertData(indata){
 }
 
 
-
-//
-
-
-//
-var CreateModal = React.createClass({
-	handleCreateClick:function(){
-		this.loadCreateForm(this.props.scope);
-	},	
-
-    handleChange:function(event){
-    	alert('test');
-    },
-    
-    handleClick:function(event){
-    	alert('test');
-    },
-    
-	loadCreateForm: function(scopeId) {
-	 	
-	
-	   bootbox.dialog({
-	            message:$('#hdnModal').html(),                
-	            title: "Create Registry Entry",
-	            buttons:{
-	            	confirm:{
-	            		label:'Save',
-	            		className:'btn',
-	            		callback:function(result){alert($("#exampleInputEmail1").val())}
-	            	},
-	            	cancel:{
-	            		label:'Cancel',
-	            		className:'btn',
-	            		callback:function(result){
-	            			alert('cancle');
-	            		}
-	            	}
-	            },
-	            onEscape: function () {alert('escape')}
-	   });
-	        
-	},	
+ 
+var Modal = React.createClass({
+	getInitialState: function() { 
+         return { isModalOpen: false }; 
+	}, 
+	openModal:function(){
+		this.setState({isModalOpen:true})
+	},
+	closeModal:function(){
+		this.setState({isModalOpen:false})
+	},
 	render: function() {
-	
-	
-	
-	return (
-	<div>
-		<div id="hdnModal" style={closeStyle}>
-		   <div id="container" style={containerStyle}>
-		 <div type="button" className="btn btn-primary" onClick={this.handleClick}>rest</div>
-		</div>
-		</div>
-	   <button type="button" onClick={this.handleCreateClick} className="btn">create</button>
-	</div>);
+		var isOpenStyle = this.state.isModalOpen?modalStyle:closeStyle;
+		return (
+		<div>
+			<div id="hdnModal" style={isOpenStyle}>
+			   <div id="container" style={containerStyle}>
+			   <div onClick={this.closeModal} className="pull-right">x</div>
+			   {this.props.children}
+			   </div> 
+			</div>
+		<button type="button" onClick={this.openModal} className="btn" style={inlineStyle}>{this.props.title}</button>
+		</div>);
 
-	}
-});
-
-
-
-var EditModal = React.createClass({
-	handleCreateClick:function(){
-		this.loadCreateForm(this.props.scope);
-	},	
-
-
-	loadCreateForm: function(scopeId) {
-	 	
-	
-	   bootbox.dialog({
-	            message:$('#hdnModal').html(),                
-	            buttons:{
-	            	confirm:{
-	            		label:'Save',
-	            		className:'btn',
-	            		callback:function(result){alert('testing');}
-	            	},
-	            	cancel:{
-	            		label:'Cancel',
-	            		className:'btn',
-	            		callback:function(result){
-	            			alert('cancle');
-	            		}
-	            	}
-	            },
-	            onEscape: function () {alert('escape')}
-	   });
-	        
-	},	
-	render: function() {
-	
-	var hdnModal={
-		display:'none'
-	}
-	
-	return (
-	<div>
-		<div style={hdnModal} id="hdnModal">
-		  
-		 <input type="button" className="btn btn-primary" value="test"/>
-				<div className="form-group">
-			    <label for="exampleInputEmail1">Email address</label>
-			    <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"/>
-			    <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small>
-			  </div>
-			  <div className="form-group">
-			    <label for="exampleInputPassword1">Password</label>
-			    <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password"/>
-			  </div>
-			  <div className="form-group">
-			    <label for="exampleSelect1">Example select</label>
-			    <select className="form-control" id="exampleSelect1">
-			      <option>1</option>
-			      <option>2</option>
-			      <option>3</option>
-			      <option>4</option>
-			      <option>5</option>
-			    </select>
-			  </div>
-			  <div className="form-group">
-			    <label for="exampleSelect2">Example multiple select</label>
-			    <select multiple class="form-control" id="exampleSelect2">
-			      <option>1</option>
-			      <option>2</option>
-			      <option>3</option>
-			      <option>4</option>
-			      <option>5</option>
-			    </select>
-			  </div>
-			  <div class="form-group">
-			    <label for="exampleTextarea">Example textarea</label>
-			    <textarea className="form-control" id="exampleTextarea" rows="3"></textarea>
-			  </div>
-			  <div class="form-group">
-			    <label for="exampleInputFile">File input</label>
-			    <input type="file" className="form-control-file" id="exampleInputFile" aria-describedby="fileHelp"/>
-			    <small id="fileHelp" className="form-text text-muted">This is some placeholder block-level help text for the above input. It's a bit lighter and easily wraps to a new line.</small>
-			  </div>
-			  <fieldset class="form-group">
-			    <legend>Radio buttons</legend>
-			    <div class="form-check">
-			      <label class="form-check-label">
-			        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios1" value="option1" checked/>
-			        Option one is this and that&mdash;be sure to include why it's great
-			      </label>
-			    </div>
-			    <div className="form-check">
-			    <label className="form-check-label">
-			        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2"/>
-			        Option two can be something else and selecting it will deselect option one
-			      </label>
-			    </div>
-			    <div className="form-check disabled">
-			    <label className="form-check-label">
-			        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios3" value="option3" disabled/>
-			        Option three is disabled
-			      </label>
-			    </div>
-			  </fieldset>
-			  <div class="form-check">
-			    <label class="form-check-label">
-			      <input type="checkbox" className="form-check-input"/>
-			      Check me out
-			    </label>
-			  </div>
-		
-		
-       </div>
-	   <button type="button" onClick={this.handleCreateClick} className="btn btn-right">Edit</button>
-	</div>);
-
-	}
+		}
 });
 
 
@@ -260,7 +114,7 @@ var RegistryApplication = React.createClass({
 	
 	render: function() {
 	return <div>
-	<RegistryEntryFilter/><RegistryScopeList createRegistryClicked={this.loadCreateForm} data={this.props.data}/></div>
+	<RegistryEntryFilter><p>Filter Form Component here</p></RegistryEntryFilter><RegistryScopeList createRegistryClicked={this.loadCreateForm} data={this.props.data}/></div>
 
 	}
 });
@@ -278,7 +132,7 @@ var RegistryScopeList = React.createClass({
 
 		return (
 			<div className="panel-group" id="accordion">
-				<div><CreateModal scope=''/></div>
+				<div><Modal title="Create"><h1>Create Form Component here</h1></Modal></div>
 		        {RegistryScopes}      
 	  	    </div>);
 			
@@ -357,73 +211,8 @@ var RegistryEntry = React.createClass({
 var RegistryEntryFilter = React.createClass({
 	render: function(){
 		return <div><nav id="myNavmenu" className="navmenu navmenu-default navmenu-fixed-left offcanvas" role="navigation">
-		
-		 <input type="button" className="btn btn-primary" value="test"/>
-				<div className="form-group">
-			    <label for="exampleInputEmail1">Email address</label>
-			    <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"/>
-			    <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small>
-			  </div>
-			  <div className="form-group">
-			    <label for="exampleInputPassword1">Password</label>
-			    <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password"/>
-			  </div>
-			  <div className="form-group">
-			    <label for="exampleSelect1">Example select</label>
-			    <select className="form-control" id="exampleSelect1">
-			      <option>1</option>
-			      <option>2</option>
-			      <option>3</option>
-			      <option>4</option>
-			      <option>5</option>
-			    </select>
-			  </div>
-			  <div className="form-group">
-			    <label for="exampleSelect2">Example multiple select</label>
-			    <select multiple class="form-control" id="exampleSelect2">
-			      <option>1</option>
-			      <option>2</option>
-			      <option>3</option>
-			      <option>4</option>
-			      <option>5</option>
-			    </select>
-			  </div>
-			  <div class="form-group">
-			    <label for="exampleTextarea">Example textarea</label>
-			    <textarea className="form-control" id="exampleTextarea" rows="3"></textarea>
-			  </div>
-			  <div class="form-group">
-			    <label for="exampleInputFile">File input</label>
-			    <input type="file" className="form-control-file" id="exampleInputFile" aria-describedby="fileHelp"/>
-			    <small id="fileHelp" className="form-text text-muted">This is some placeholder block-level help text for the above input. It's a bit lighter and easily wraps to a new line.</small>
-			  </div>
-			  <fieldset class="form-group">
-			    <legend>Radio buttons</legend>
-			    <div class="form-check">
-			      <label class="form-check-label">
-			        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios1" value="option1" checked/>
-			        Option one is this and that&mdash;be sure to include why it's great
-			      </label>
-			    </div>
-			    <div className="form-check">
-			    <label className="form-check-label">
-			        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2"/>
-			        Option two can be something else and selecting it will deselect option one
-			      </label>
-			    </div>
-			    <div className="form-check disabled">
-			    <label className="form-check-label">
-			        <input type="radio" className="form-check-input" name="optionsRadios" id="optionsRadios3" value="option3" disabled/>
-			        Option three is disabled
-			      </label>
-			    </div>
-			  </fieldset>
-			  <div class="form-check">
-			    <label class="form-check-label">
-			      <input type="checkbox" className="form-check-input"/>
-			      Check me out
-			    </label>
-			  </div>
+		 <h3>Filter</h3>
+		 {this.props.children}
 		
 		</nav>
 		<div className="navbar navbar-default navbar-fixed-top">
@@ -445,25 +234,13 @@ var RegistryEntryFilter = React.createClass({
 
 
 
-var RegistryEntryUpdate = React.createClass({
-	  render: function() {
-	    return  <div id={this.props.id} className="panel-collapse collapse">
-	    <div className="panel-body">
-	    edit form here.
-	    </div>
-	</div>  
-
-	  }
-	});
-
-
-
 var RegistryEntryRead = React.createClass({
   render: function() {
     return  <div id={this.props.id} className="panel-collapse collapse">
     <div className="panel-body">
     <h1>Registry Entry (Read Only)</h1>
-    <EditModal />
+    <Modal title="Edit"><h3>Edit Form Component here.</h3></Modal>
+    <Modal title="Create"><h3>Create Form Component here.</h3></Modal>
     </div>
 </div>  
 
