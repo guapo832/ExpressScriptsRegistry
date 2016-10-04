@@ -3,7 +3,6 @@
  */
 
 
-
 var modalStyle = {
 		  position: 'fixed',
 		  fontFamily: 'Arial, Helvetica, sans-serif',
