@@ -3,6 +3,8 @@
  */
 
 
+
+
 var modalStyle = {
 		  position: 'fixed',
 		  fontFamily: 'Arial, Helvetica, sans-serif',
@@ -108,14 +110,13 @@ var Modal = React.createClass({
 
 
 var RegistryApplication = React.createClass({
-	
-
-	
 	render: function() {
-	return <div>
+    return <div>
+	
 	<RegistryEntryFilter><p>Filter Form Component here</p></RegistryEntryFilter><RegistryScopeList createRegistryClicked={this.loadCreateForm} data={this.props.data}/></div>
-
-	}
+    }
+	
+	
 });
 
 
@@ -165,6 +166,10 @@ var RegistryScope = React.createClass({
 
 
 
+
+
+
+
 var RegistryEntryList = React.createClass({
 	  render: function() {
 		  var parent="accordion" + this.props.id;
@@ -179,6 +184,19 @@ var RegistryEntryList = React.createClass({
 	  }
 	});
 
+
+var RegistryEntryRead = React.createClass({
+  render: function() {
+    return  <div id={this.props.id} className="panel-collapse collapse">
+    <div className="panel-body">
+    <h1>Registry Entry (Read Only)</h1>
+    <Modal title="Edit"><h3>Edit Form Component here.</h3></Modal>
+    <Modal title="Create"><h3>Create Form Component here.</h3></Modal>
+    </div>
+</div>  
+
+  }
+});
 
 var RegistryEntry = React.createClass({
 	render:function(){
@@ -204,9 +222,6 @@ var RegistryEntry = React.createClass({
 })
 
 
-
-
-
 var RegistryEntryFilter = React.createClass({
 	render: function(){
 		return <div><nav id="myNavmenu" className="navmenu navmenu-default navmenu-fixed-left offcanvas" role="navigation">
@@ -230,28 +245,10 @@ var RegistryEntryFilter = React.createClass({
 });
 
 
-
-
-
-var RegistryEntryRead = React.createClass({
-  render: function() {
-    return  <div id={this.props.id} className="panel-collapse collapse">
-    <div className="panel-body">
-    <h1>Registry Entry (Read Only)</h1>
-    <Modal title="Edit"><h3>Edit Form Component here.</h3></Modal>
-    <Modal title="Create"><h3>Create Form Component here.</h3></Modal>
-    </div>
-</div>  
-
-  }
-});
-
-  
 var scopes=convertData(regentries);
 ReactDOM.render(
-	    <RegistryApplication data={scopes}/>,
-	    document.getElementById('registrycontainer')
-	  );
-
+		    <RegistryApplication data={scopes}/>,
+		    document.getElementById('registrycontainer')
+		  );
 
   
