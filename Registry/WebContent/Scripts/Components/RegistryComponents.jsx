@@ -77,7 +77,8 @@ function convertData(indata){
 		}
 	}
 	
-	return scopeArray
+	
+	return {ScopeArray:scopeArray,ScopeAssoc:scopeAssoc};
 }
 
 var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
@@ -137,11 +138,18 @@ var RegistryApplication = React.createClass({
     	
     	
     	
-    	 newData.push(destScope);
-    	 
+    	 newData.ScopeArray.push(destScope);
+    	  	 
     	 
     	 
     	 this.setState({data:newData})
+     },
+     
+     deleteScope:function(scope){
+    	 var newData = this.state.data;
+    	 var idx = newData.ScopeAssoc[scope.scope];
+    	 newData.ScopeArray.splice(idx,1);
+    	 this.setState({data:newData});
      },
  	render: function() {
  		
@@ -156,7 +164,7 @@ var RegistryApplication = React.createClass({
                <button onClick={this.closeModal}>Close modal</button> 
         </Modal>      
     
-	<RegistryEntryFilter><p>Filter Form Component here</p></RegistryEntryFilter><RegistryScopeList copyScopeHandler={this.copyScope} data={this.state.data}/></div>
+	<RegistryEntryFilter><p>Filter Form Component here</p></RegistryEntryFilter><RegistryScopeList deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/></div>
     }
 	
 	
@@ -168,12 +176,16 @@ var RegistryScopeList = React.createClass({
 	handleCopyScope: function(oldScope,newScope){
 		this.props.copyScopeHandler(oldScope,newScope)
     },
+    handleDeleteScope: function(scope){
+    	this.props.deleteScopeHandler(scope);
+    },
 	render: function(){
 		return(<div className="panel-group" id="accordion">
 			{this.props.data.map(function(scopes) {
-		      var boundCopyScope = this.handleCopyScope.bind(this,scopes);		
+		      var boundCopyScope = this.handleCopyScope.bind(this,scopes);	
+		      var boundDeleteScope = this.handleDeleteScope.bind(this.scopes);
 		      return (
-		    	 		  <RegistryScope handleCopyScope={boundCopyScope}  data={scopes.regentries} key={scopes.scope} idx={scopes.scope}/>
+		    	 		  <RegistryScope handleDeleteScope={boundDeleteScope} handleCopyScope={boundCopyScope}  data={scopes.regentries} key={scopes.scope} idx={scopes.scope}/>
 		    	      );
 		     },this)}
 			</div>
@@ -252,6 +264,10 @@ var RegistryScope = React.createClass({
         this.closeModal();
      },
      
+     onHandleDeleteScope:function(scope){
+    	 this.props.handleDeleteScope(scope)
+     },
+     
      openCopyScope: function(){
         
         this.setState({ isModalOpen: true,
@@ -263,9 +279,7 @@ var RegistryScope = React.createClass({
      closeModal: function() { 
          this.setState({ isModalOpen: false }); 
      },
-     deleteScope: function() { 
-         alert('deleting scope' + this.props.idx); 
-     },  
+     
 	render: function(){
 		
 	   
@@ -280,7 +294,7 @@ var RegistryScope = React.createClass({
         <div className="panel-heading">
         <h4 className="panel-title">
           <span style={collapsePanelLink} data-toggle="collapse" data-parent="#accordion" data-target={datatarget}>{this.props.idx}</span>
-          <span className="panel-title pull-right"><a href="#" onClick={this.openCopyScope}><span title="Copy Scope" className="glyphicon glyphicon-share"></span></a><a href="#" onClick={this.deleteScope}><span title="delete scope" className="glyphicon glyphicon-remove"></span></a></span>
+          <span className="panel-title pull-right"><a href="#" onClick={this.openCopyScope}><span title="Copy Scope" className="glyphicon glyphicon-share"></span></a><a href="#" onClick={this.onHandleDeleteScope}><span title="delete scope" className="glyphicon glyphicon-remove"></span></a></span>
         </h4>
       </div>
       <div id={id} className="panel-collapse collapse">
@@ -408,3 +422,4 @@ React.render(
 		  );
 
   
+
