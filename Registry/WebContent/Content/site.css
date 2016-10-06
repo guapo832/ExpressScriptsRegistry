@@ -1,4 +1,4 @@
-﻿body {
+body {
     padding-top: 50px;
     padding-bottom: 20px;
 }
@@ -22,3 +22,44 @@ select,
 textarea {
     max-width: 280px;
 }
+
+
+.modal {
+    width: 200px;
+    height: 100px;
+    padding: 20px;
+
+    position: absolute;
+    z-index: 999;
+    top: 50%;
+    left: 50%;
+    margin: -70px 0 0 -120px;
+
+    border: 1px solid #ccc;
+    background: white;
+}
+
+/* Animation */
+
+.modal-anim-enter {
+    opacity: 1;
+    transform: scale(0.7);
+    transition: all 0.2s;
+}
+
+.modal-anim-enter.modal-anim-enter-active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.modal-anim-leave {
+    opacity: 1;
+    transform: scale(1);
+    transition: all 0.2s;
+}
+
+.modal-anim-leave.modal-anim-leave-active {
+    opacity: 1;
+    transform: scale(0.7);
+}
+

@@ -3,7 +3,9 @@
  */
 
 
-
+var collapsePanelLink={
+    cursor:'pointer'
+}
 
 var modalStyle = {
 		  position: 'fixed',
@@ -20,7 +22,8 @@ var modalStyle = {
 		}
 
 		var containerStyle = {
-		  width: '400px',
+		  width: '600px',
+		  height:'auto',
 		  position: 'relative',
 		  margin: '10% auto',
 		  padding: '5px 20px 13px 20px',
@@ -74,35 +77,33 @@ function convertData(indata){
 		}
 	}
 	
-	return scopeArray;
+	return scopeArray
 }
 
-
+var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
  
 var Modal = React.createClass({
-	getInitialState: function() { 
-         return { isModalOpen: false }; 
-	}, 
-	openModal:function(){
-		this.setState({isModalOpen:true})
-	},
-	closeModal:function(){
-		this.setState({isModalOpen:false})
-	},
 	render: function() {
-		var isOpenStyle = this.state.isModalOpen?modalStyle:closeStyle;
-		return (
-		<div>
-			<div id="hdnModal" style={isOpenStyle}>
-			   <div id="container" style={containerStyle}>
-			   <div onClick={this.closeModal} className="pull-right">x</div>
-			   {this.props.children}
-			   </div> 
-			</div>
-		<button type="button" onClick={this.openModal} className="btn" style={inlineStyle}>{this.props.title}</button>
-		</div>);
-
-		}
+	if(this.props.isOpen){
+		return (<ReactCSSTransitionGroup transitionName={this.props.transitionName}
+			transitionEnterTimeout={5000}
+			transitionLeaveTimeout={3000}
+			transitionAppear={true} >
+					<div>
+						<div style={modalStyle}>
+							<div style={containerStyle}>
+								{this.props.children}
+							</div>
+						</div> 
+					</div>
+				</ReactCSSTransitionGroup>
+		        
+       );
+    } else {
+    	return null;
+    }
+	    
+	}
 });
 
 
@@ -110,10 +111,52 @@ var Modal = React.createClass({
 
 
 var RegistryApplication = React.createClass({
-	render: function() {
+	getInitialState: function() { 
+         return { isModalOpen: false, data:convertData([])}; 
+     }, 
+     
+     componentDidMount: function(){
+    	 
+         this.setState({data:this.props.data});
+     },
+ 
+      openModal: function() { 
+         this.setState({ isModalOpen: true }); 
+     }, 
+  
+     closeModal: function() { 
+         this.setState({ isModalOpen: false }); 
+     }, 
+     copyScope: function(oldScope,newScope){
+    	var newData = this.state.data;
+    	var destScope = {scope:newScope.scope,regentries:[]};
+    	
+    	for(i=0;i<oldScope.regentries.length;i++){
+    		destScope.regentries.push({scope:newScope.scope, name:oldScope.regentries[i].name,id:oldScope.regentries[i].id});
+    	}
+    	
+    	
+    	
+    	 newData.push(destScope);
+    	 
+    	 
+    	 
+    	 this.setState({data:newData})
+     },
+ 	render: function() {
+ 		
+ 	
     return <div>
-	
-	<RegistryEntryFilter><p>Filter Form Component here</p></RegistryEntryFilter><RegistryScopeList createRegistryClicked={this.loadCreateForm} data={this.props.data}/></div>
+   	 <a href="#" onClick={this.openModal}><span className="glyphicon glyphicon-plus-sign" title="Add Entry"></span></a> 
+        <Modal isOpen={this.state.isModalOpen} transitionName="modal-anim"> 
+              <h3>My Modal</h3> 
+               <div className="body"> 
+                 <p>This is the modal&apos;s body.</p> 
+               </div> 
+               <button onClick={this.closeModal}>Close modal</button> 
+        </Modal>      
+    
+	<RegistryEntryFilter><p>Filter Form Component here</p></RegistryEntryFilter><RegistryScopeList copyScopeHandler={this.copyScope} data={this.state.data}/></div>
     }
 	
 	
@@ -122,25 +165,107 @@ var RegistryApplication = React.createClass({
 
 
 var RegistryScopeList = React.createClass({
+	handleCopyScope: function(oldScope,newScope){
+		this.props.copyScopeHandler(oldScope,newScope)
+    },
 	render: function(){
-		
-		var RegistryScopes= this.props.data.map(function(scopes) {
+		return(<div className="panel-group" id="accordion">
+			{this.props.data.map(function(scopes) {
+		      var boundCopyScope = this.handleCopyScope.bind(this,scopes);		
 		      return (
-		    	 		  <RegistryScope data={scopes.regentries} key={scopes.scope} idx={scopes.scope}/>
+		    	 		  <RegistryScope handleCopyScope={boundCopyScope}  data={scopes.regentries} key={scopes.scope} idx={scopes.scope}/>
 		    	      );
-		    	    });
-
-		return (
-			<div className="panel-group" id="accordion">
-				<div><Modal title="Create"><h1>Create Form Component here</h1></Modal></div>
-		        {RegistryScopes}      
-	  	    </div>);
-			
+		     },this)}
+			</div>
+		);
 	}
 });
 
 
+var CopyScopeForm = React.createClass({
+
+	getInitialState: function(){
+		return{scope:''};
+	},
+   handleCancel: function(){
+      this.props.onCancel();
+   },
+   
+   handleScopeChange: function(e){
+   	 this.setState({scope: e.target.value});
+   },
+   
+   handleSubmit: function(e){
+      //TODO do submit
+      e.preventDefault();
+      var scope=this.state.scope;
+      //todo send request to server
+      this.props.onSubmit({scope:scope});
+   },
+   render: function(){
+      return (<form>
+    <div className="form-group row">
+      <label for="txtScope" className="col-sm-2 col-form-label">Scope</label>
+      <div className="col-sm-10">
+        <input type="text" className="form-control" onChange={this.handleScopeChange} id="txtScope" placeholder="Scope"/>
+      </div>
+    </div>
+          
+    <div className="form-group row">
+      <div className="offset-sm-2 col-sm-10">
+        <button type="submit" className="btn btn-primary" onClick={this.handleSubmit}>Submit</button>
+        <button type="button" className="btn btn-primary" onClick={this.handleCancel}>Cancel</button>
+      </div>
+    </div>
+  </form>);
+   }
+});
+
+
 var RegistryScope = React.createClass({
+	 getInitialState: function() { 
+         return { isModalOpen: false,
+         		ModalData:null
+          }; 
+         
+     }, 
+ 
+     openModal: function() { 
+         this.setState({ isModalOpen: true }); 
+     }, 
+ 
+     openCreateEntry: function(){
+        
+        this.setState({ isModalOpen: true,
+        ModalData:<div><h3>CreateEntry</h3> 
+               <div className="body"> 
+                 <p>This is the modal&apos;s body.</p> 
+               </div> 
+               <button onClick={this.closeModal}>Close modal</button></div> 
+		});
+        
+     },
+     
+     onHandleCopyScopeSubmit:function(newScope){
+    	this.props.handleCopyScope(newScope);
+        //TODO add copy functionality;
+        this.closeModal();
+     },
+     
+     openCopyScope: function(){
+        
+        this.setState({ isModalOpen: true,
+        ModalData:<div><h3>Copy Scope</h3><CopyScopeForm onCancel={this.closeModal} onSubmit={this.onHandleCopyScopeSubmit}/></div>   
+               
+		});
+        
+     },
+     closeModal: function() { 
+         this.setState({ isModalOpen: false }); 
+     },
+     deleteScope: function() { 
+         alert('deleting scope' + this.props.idx); 
+     },  
 	render: function(){
 		
 	   
@@ -149,14 +274,19 @@ var RegistryScope = React.createClass({
 	    
 	    
 		return (<div className="panel panel-primary">
+		<Modal isOpen={this.state.isModalOpen} transitionName="modal-anim"> 
+              {this.state.ModalData} 
+        </Modal> 
         <div className="panel-heading">
         <h4 className="panel-title">
-          <span data-toggle="collapse" data-parent="#accordion" data-target={datatarget}>{this.props.idx}</span>
+          <span style={collapsePanelLink} data-toggle="collapse" data-parent="#accordion" data-target={datatarget}>{this.props.idx}</span>
+          <span className="panel-title pull-right"><a href="#" onClick={this.openCopyScope}><span title="Copy Scope" className="glyphicon glyphicon-share"></span></a><a href="#" onClick={this.deleteScope}><span title="delete scope" className="glyphicon glyphicon-remove"></span></a></span>
         </h4>
       </div>
       <div id={id} className="panel-collapse collapse">
 	    <div className="panel-body">
-	    <RegistryEntryList id={id} data={this.props.data}/>
+	    <a href="#" onClick={this.openCreateEntry}><span title="Create Entry in this scope" className="glyphicon glyphicon-plus"></span></a> 
+        <RegistryEntryList id={id} data={this.props.data}/>
 	    </div>
 	    </div></div>);
       
@@ -188,17 +318,38 @@ var RegistryEntryList = React.createClass({
 var RegistryEntryRead = React.createClass({
   render: function() {
     return  <div id={this.props.id} className="panel-collapse collapse">
-    <div className="panel-body">
-    <h1>Registry Entry (Read Only)</h1>
-    <Modal title="Edit"><h3>Edit Form Component here.</h3></Modal>
-    <Modal title="Create"><h3>Create Form Component here.</h3></Modal>
-    </div>
-</div>  
+    			<div className="panel-body">
+    				
+    				<h1>Registry Entry (Read Only)</h1>
+       			</div>
+       		</div>
+  
 
   }
 });
 
 var RegistryEntry = React.createClass({
+	getInitialState: function() { 
+         return { isModalOpen: false,
+         		ModalData:null
+          }; 
+         
+     }, 
+    openEditEntry: function(){
+        
+        this.setState({ isModalOpen: true,
+        ModalData:<div><h3>Edit Entry</h3> 
+               		<div className="body"> 
+                 		<p>This is the modal&apos;s body.</p> 
+               		</div> 
+               		<button onClick={this.closeModal}>Close modal</button>
+               	 </div> 
+		});
+        
+     },
+     closeModal: function() { 
+         this.setState({ isModalOpen: false }); 
+     },
 	render:function(){
 		var id = this.props.data.id;
 		var editid = this.props.data.id + "edit";
@@ -209,15 +360,20 @@ var RegistryEntry = React.createClass({
 		
 	    
 		return <div className="panel panel-default">
-        <div className="panel-heading">
-        <h4 className="panel-title">
-          <span data-toggle="collapse" data-parent={dataparent} data-target={datatarget}>{this.props.data.name}</span>
-          
-        </h4>
-      </div>
-      <RegistryEntryRead id={this.props.data.id} data={this.props.data}/>
-      
-  </div>
+					<Modal isOpen={this.state.isModalOpen} transitionName="modal-anim"> 
+              			{this.state.ModalData} 
+    				</Modal> 
+        			<div className="panel-heading">
+        				<h4 className="panel-title">
+          					<span style={collapsePanelLink}  data-toggle="collapse" data-parent={dataparent} data-target={datatarget}>{this.props.data.name}</span>
+          					<a href="#" className="pull-right" onClick={this.openEditEntry}><span title="edit entry" className="glyphicon glyphicon-edit"></span></a>&nbsp;
+          					<a href="#" className="pull-right" onClick={this.deleteScope}><span title="delete entry" className="glyphicon glyphicon-remove"></span></a>
+           				</h4>
+      		   		</div>
+      		   				
+    						<RegistryEntryRead id={this.props.data.id} data={this.props.data}/>
+    				
+      		  	</div>
 	}
 })
 
@@ -244,10 +400,10 @@ var RegistryEntryFilter = React.createClass({
 	}
 });
 
+var convertedData =convertData(regentries); 
 
-var scopes=convertData(regentries);
-ReactDOM.render(
-		    <RegistryApplication data={scopes}/>,
+React.render(
+		    <RegistryApplication data={convertedData}/>,
 		    document.getElementById('registrycontainer')
 		  );
 
