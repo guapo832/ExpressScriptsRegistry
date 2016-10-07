@@ -65,17 +65,18 @@ var regentries = [{scope:"scope1", name:"some registry entry 1",id:1},
 
 function convertData(indata){
 	var scopeArray=[];
-	var scopeAssoc=[];
+	var scopeAssoc={};
 	var idx=0;
 	for(var i=0;i<indata.length;i++){
 		if(typeof(scopeAssoc[indata[i].scope]) == 'undefined'){
 			scopeAssoc[indata[i].scope] = idx;
-            scopeArray.push({scope:indata[i].scope,regentries:[indata[i]]});
+			scopeArray.push({scope:indata[i].scope,regentries:[indata[i]]});
             idx++;
 		}else{
 		    scopeArray[scopeAssoc[indata[i].scope]].regentries.push(indata[i]);
 		}
 	}
+	
 	
 	
 	return {ScopeArray:scopeArray,ScopeAssoc:scopeAssoc};
@@ -133,11 +134,11 @@ var RegistryApplication = React.createClass({
     	var destScope = {scope:newScope.scope,regentries:[]};
     	
     	for(i=0;i<oldScope.regentries.length;i++){
-    		destScope.regentries.push({scope:newScope.scope, name:oldScope.regentries[i].name,id:oldScope.regentries[i].id});
+    		destScope.regentries.push({scope:newScope.scope, name:oldScope.regentries[i].name,id:oldScope.regentries[i].id + 10});
     	}
     	
     	
-    	
+    			
     	 newData.ScopeArray.push(destScope);
     	  	 
     	 
@@ -147,8 +148,10 @@ var RegistryApplication = React.createClass({
      
      deleteScope:function(scope){
     	 var newData = this.state.data;
-    	 var idx = newData.ScopeAssoc[scope.scope];
-    	 newData.ScopeArray.splice(idx,1);
+    	 var idx = newData.ScopeAssoc[scope]
+    	 
+    	 
+    	 	 newData.ScopeArray.splice(idx,1);
     	 this.setState({data:newData});
      },
  	render: function() {
@@ -164,7 +167,7 @@ var RegistryApplication = React.createClass({
                <button onClick={this.closeModal}>Close modal</button> 
         </Modal>      
     
-	<RegistryEntryFilter><p>Filter Form Component here</p></RegistryEntryFilter><RegistryScopeList deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/></div>
+	<RegistryEntryFilter><p>test</p></RegistryEntryFilter><RegistryScopeList deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/></div>
     }
 	
 	
@@ -177,6 +180,7 @@ var RegistryScopeList = React.createClass({
 		this.props.copyScopeHandler(oldScope,newScope)
     },
     handleDeleteScope: function(scope){
+    	alert(scope)
     	this.props.deleteScopeHandler(scope);
     },
 	render: function(){
@@ -233,6 +237,11 @@ var CopyScopeForm = React.createClass({
    }
 });
 
+var CreateRegistryEntryForm = React.createClass({
+	render:function(){
+		return (<p>some form</p>);
+	}
+});
 
 var RegistryScope = React.createClass({
 	 getInitialState: function() { 
@@ -250,10 +259,7 @@ var RegistryScope = React.createClass({
         
         this.setState({ isModalOpen: true,
         ModalData:<div><h3>CreateEntry</h3> 
-               <div className="body"> 
-                 <p>This is the modal&apos;s body.</p> 
-               </div> 
-               <button onClick={this.closeModal}>Close modal</button></div> 
+               <CreateRegistryEntryForm/></div>
 		});
         
      },
@@ -264,8 +270,9 @@ var RegistryScope = React.createClass({
         this.closeModal();
      },
      
-     onHandleDeleteScope:function(scope){
-    	 this.props.handleDeleteScope(scope)
+     onHandleDeleteScope:function(){
+    	 alert("scope: " + this.props.idx)
+    	 this.props.handleDeleteScope(this.props.idx)
      },
      
      openCopyScope: function(){
@@ -333,7 +340,8 @@ var RegistryEntryRead = React.createClass({
   render: function() {
     return  <div id={this.props.id} className="panel-collapse collapse">
     			<div className="panel-body">
-    				
+    				Name: blah
+    				Confidential
     				<h1>Registry Entry (Read Only)</h1>
        			</div>
        		</div>
@@ -415,7 +423,7 @@ var RegistryEntryFilter = React.createClass({
 });
 
 var convertedData =convertData(regentries); 
-
+alert(JSON.stringify(convertedData))
 React.render(
 		    <RegistryApplication data={convertedData}/>,
 		    document.getElementById('registrycontainer')
