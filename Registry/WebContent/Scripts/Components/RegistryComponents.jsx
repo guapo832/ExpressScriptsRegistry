@@ -7,6 +7,10 @@ var collapsePanelLink={
     cursor:'pointer'
 }
 
+var filterPanelStyle = {
+		padding:'10px',
+}
+
 var modalStyle = {
 		  position: 'fixed',
 		  fontFamily: 'Arial, Helvetica, sans-serif',
@@ -167,7 +171,7 @@ var RegistryApplication = React.createClass({
                <button onClick={this.closeModal}>Close modal</button> 
         </Modal>      
     
-	<RegistryEntryFilter><p>test</p></RegistryEntryFilter><RegistryScopeList deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/></div>
+	<RegistryEntryFilter><FilterForm/></RegistryEntryFilter><RegistryScopeList deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/></div>
     }
 	
 	
@@ -180,7 +184,6 @@ var RegistryScopeList = React.createClass({
 		this.props.copyScopeHandler(oldScope,newScope)
     },
     handleDeleteScope: function(scope){
-    	alert(scope)
     	this.props.deleteScopeHandler(scope);
     },
 	render: function(){
@@ -239,9 +242,36 @@ var CopyScopeForm = React.createClass({
 
 var CreateRegistryEntryForm = React.createClass({
 	render:function(){
-		return (<p>some form</p>);
+		return (<div>
+		<h1>This form to Needs to be developed by team</h1>
+		<button className="btn btn-primary pull-right" onClick={this.handleCancel}>Cancel</button></div>);
 	}
 });
+
+
+var FilterForm = React.createClass({
+	render:function(){
+		return (
+		<form>
+		  <h3>Filter Registry Entries</h3>
+		  <div class="form-group">
+		    <label for="scope">Scope</label>
+		    <input type="text" class="form-control" id="scope"/>
+		  </div>
+		  <div class="form-group">
+		    <label for="name">Name:</label>
+		    <input type="text" class="form-control" id="name"/>
+		  </div>
+		  <div class="checkbox">
+		    <label><input type="checkbox" id="confidential"/>Is Confidential</label>
+		  </div>
+		  
+		  <button type="submit" class="btn btn-primary pull-right">Submit</button>
+		</form>
+		);
+	}
+});
+
 
 var RegistryScope = React.createClass({
 	 getInitialState: function() { 
@@ -271,8 +301,7 @@ var RegistryScope = React.createClass({
      },
      
      onHandleDeleteScope:function(){
-    	 alert("scope: " + this.props.idx)
-    	 this.props.handleDeleteScope(this.props.idx)
+    	  this.props.handleDeleteScope(this.props.idx)
      },
      
      openCopyScope: function(){
@@ -402,8 +431,8 @@ var RegistryEntry = React.createClass({
 
 var RegistryEntryFilter = React.createClass({
 	render: function(){
-		return <div><nav id="myNavmenu" className="navmenu navmenu-default navmenu-fixed-left offcanvas" role="navigation">
-		 <h3>Filter</h3>
+		return <div><nav id="myNavmenu" style={filterPanelStyle} className="navmenu navmenu-default navmenu-fixed-left offcanvas" role="navigation">
+		 
 		 {this.props.children}
 		
 		</nav>
@@ -423,7 +452,7 @@ var RegistryEntryFilter = React.createClass({
 });
 
 var convertedData =convertData(regentries); 
-alert(JSON.stringify(convertedData))
+
 React.render(
 		    <RegistryApplication data={convertedData}/>,
 		    document.getElementById('registrycontainer')
