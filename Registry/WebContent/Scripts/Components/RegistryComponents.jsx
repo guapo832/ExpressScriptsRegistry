@@ -122,8 +122,19 @@ var RegistryApplication = React.createClass({
      }, 
      
      componentDidMount: function(){
-    	 
-         this.setState({data:this.props.data});
+    	 $.ajax({
+    	      url: this.props.url + "/registryEntry",
+    	      dataType: 'json',
+    	      cache: false,
+    	      success: function(data) {
+    	    	 this.setState({data: convertData(data.list)});
+    	      }.bind(this),
+    	      error: function(xhr, status, err) {
+    	        console.error(this.props.url, status, err.toString());
+    	      }.bind(this)
+    	    });
+
+         
      },
  
       openModal: function() { 
@@ -138,16 +149,38 @@ var RegistryApplication = React.createClass({
     	var destScope = {scope:newScope.scope,regentries:[]};
     	
     	for(i=0;i<oldScope.regentries.length;i++){
-    		destScope.regentries.push({scope:newScope.scope, name:oldScope.regentries[i].name,id:oldScope.regentries[i].id + 10});
+    		destScope.regentries.push({scope:newScope.scope, name:oldScope.regentries[i].name,id:0});
     	}
     	
-    	
+    	var newList = {list:destScope.regentries,totalCount:destScope.regentries.length}
+    	 	$.ajax({
+  	      url: this.props.url + "/registryEntry/batch",
+  	      type: "POST",
+  	      dataType: 'json',
+  	      data:JSON.stringify(newList),
+  	      processData:false,
+  	      cache: false,
+  	      contentType:'application/json',
+  	      success: function(data) {
+  	    	  
+  	    	 newData.ScopeArray.push({scope:newScope.scope,regentries:data.list});
+  	    	 newData.ScopeAssoc[newScope.scope] = newData.ScopeArray.length-1;
+  	    	 alert(JSON.stringify(data));
+  	    	this.setState({data:newData})
+  	    	
+  	      }.bind(this),
+  	      error: function(xhr, status, err) {
+  	    	  alert("Error" + err.toString());
+  	    	  alert(JSON.stringify(xhr));
+  	        console.error(this.props.url, status, err.toString());
+  	      }.bind(this)
+  	    });
     			
-    	 newData.ScopeArray.push(destScope);
+    	 
     	  	 
     	 
+    	
     	 
-    	 this.setState({data:newData})
      },
      
      deleteScope:function(scope){
@@ -451,10 +484,10 @@ var RegistryEntryFilter = React.createClass({
 	}
 });
 
-var convertedData =convertData(regentries); 
+//var convertedData =convertData(regentries); 
 
 React.render(
-		    <RegistryApplication data={convertedData}/>,
+		    <RegistryApplication url="http://localhost:8090"/>,
 		    document.getElementById('registrycontainer')
 		  );
 
