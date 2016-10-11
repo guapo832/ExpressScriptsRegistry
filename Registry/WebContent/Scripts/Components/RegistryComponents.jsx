@@ -369,7 +369,7 @@ var RegistryEntryRead = React.createClass({
   render: function() {
     return  <div id={this.props.id} className="panel-collapse collapse">
     			<div className="panel-body">
-    				Name: blah
+    				Name: blahnnnnnn!
     				Confidential
     				<h1>Registry Entry (Read Only)</h1>
        			</div>
