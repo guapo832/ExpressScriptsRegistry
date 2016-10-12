@@ -91,9 +91,10 @@ var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 var Modal = React.createClass({
 	render: function() {
 	if(this.props.isOpen){
-		return (<ReactCSSTransitionGroup transitionName={this.props.transitionName}
-			transitionEnterTimeout={5000}
-			transitionLeaveTimeout={3000}
+		return (<ReactCSSTransitionGroup 
+			transitionName='modal'
+			transitionEnterTimeout={1000}
+			transitionLeaveTimeout={1000}
 			transitionAppear={true} >
 					<div>
 						<div style={modalStyle}>
@@ -121,24 +122,29 @@ var RegistryApplication = React.createClass({
          return { isModalOpen: false, data:convertData([])}; 
      }, 
      
-     componentDidMount: function(){
+     getData:function(){
     	 $.ajax({
-    	      url: this.props.url + "/registryEntry",
-    	      dataType: 'json',
-    	      cache: false,
-    	      success: function(data) {
-    	    	 this.setState({data: convertData(data.list)});
-    	      }.bind(this),
-    	      error: function(xhr, status, err) {
-    	        console.error(this.props.url, status, err.toString());
-    	      }.bind(this)
-    	    });
+   	      url: this.props.url + "/registryEntry",
+   	      dataType: 'json',
+   	      cache: false,
+   	      success: function(data) {
+   	    	 this.setState({data: convertData(data.list)});
+   	      }.bind(this),
+   	      error: function(xhr, status, err) {
+   	        console.error(this.props.url, status, err.toString());
+   	      }.bind(this)
+   	    });
 
-         
+
+     },
+     
+     componentDidMount: function(){
+    	 this.getData();
+    	          
      },
  
       openModal: function() { 
-         this.setState({ isModalOpen: true }); 
+         this.setState({transitionName:'modal', isModalOpen: true }); 
      }, 
   
      closeModal: function() { 
@@ -185,11 +191,28 @@ var RegistryApplication = React.createClass({
      
      deleteScope:function(scope){
     	 var newData = this.state.data;
-    	 var idx = newData.ScopeAssoc[scope]
+    	 var idx = newData.ScopeAssoc[scope];
+    	 var deleteArr = [];
+    	 for(i = 0; i< newData.ScopeArray[idx].regentries.length; i++){
+    	      deleteArr.push(newData.ScopeArray[idx].regentries[i].id);
+    	 }
+    	 	 
+    	    	 
+        	 $.ajax({
+       	      url: this.props.url + "/registryEntry/" + deleteArr.join(),
+       	      type:'DELETE',
+       	      cache: false,
+       	      success: function(data) {
+       	    	   this.getData();
+       	      }.bind(this),
+       	      error: function(xhr, status, err) {
+       	    	  alert(status);
+       	    	  alert(err.toString());
+       	        console.error(this.props.url, status, err.toString());
+       	      }.bind(this)
+       	    });
     	 
     	 
-    	 	 newData.ScopeArray.splice(idx,1);
-    	 this.setState({data:newData});
      },
  	render: function() {
  		
@@ -220,14 +243,21 @@ var RegistryScopeList = React.createClass({
     	this.props.deleteScopeHandler(scope);
     },
 	render: function(){
-		return(<div className="panel-group" id="accordion">
-			{this.props.data.map(function(scopes) {
+		var items = this.props.data.map(function(scopes) {
 		      var boundCopyScope = this.handleCopyScope.bind(this,scopes);	
 		      var boundDeleteScope = this.handleDeleteScope.bind(this.scopes);
 		      return (
 		    	 		  <RegistryScope handleDeleteScope={boundDeleteScope} handleCopyScope={boundCopyScope}  data={scopes.regentries} key={scopes.scope} idx={scopes.scope}/>
 		    	      );
-		     },this)}
+		     },this);
+		return(<div className="panel-group" id="accordion">
+		
+		<ReactCSSTransitionGroup 
+        transitionName="scopelist" 
+        transitionAppear={true} 
+        transitionAppearTimeout={1000}>
+        {items}
+		</ReactCSSTransitionGroup>
 			</div>
 		);
 	}
@@ -305,6 +335,18 @@ var FilterForm = React.createClass({
 	}
 });
 
+var ConfirmDeleteScopeForm = React.createClass({
+	render:function(){
+		return (
+		<div>
+		  <h3>Confirm Delete Scope</h3>
+		  <p>Are you sure you want to delete this scope</p>
+		  <button type="button" onClick={this.props.onSubmit} className="btn btn-primary pull-right">Submit</button>
+		  <button type="button" onClick={this.props.onCancel} className="btn btn-primary pull-right">Cancel</button>
+		</div>
+		);
+	}
+});
 
 var RegistryScope = React.createClass({
 	 getInitialState: function() { 
@@ -317,6 +359,9 @@ var RegistryScope = React.createClass({
      openModal: function() { 
          this.setState({ isModalOpen: true }); 
      }, 
+     closeModal: function() { 
+         this.setState({ isModalOpen: false }); 
+     },
  
      openCreateEntry: function(){
         
@@ -334,20 +379,25 @@ var RegistryScope = React.createClass({
      },
      
      onHandleDeleteScope:function(){
-    	  this.props.handleDeleteScope(this.props.idx)
+    	 this.props.handleDeleteScope(this.props.idx)
      },
      
-     openCopyScope: function(){
-        
+     confirmDeleteScope:function(e){
+    	 e.preventDefault();
+    	 this.setState({ isModalOpen: true,
+ 	        ModalData:<div><ConfirmDeleteScopeForm onCancel={this.closeModal} onSubmit={this.onHandleDeleteScope}/></div>});
+ 	 
+     },
+     
+     openCopyScope: function(e){
+        e.preventDefault();
         this.setState({ isModalOpen: true,
         ModalData:<div><h3>Copy Scope</h3><CopyScopeForm onCancel={this.closeModal} onSubmit={this.onHandleCopyScopeSubmit}/></div>   
                
 		});
         
      },
-     closeModal: function() { 
-         this.setState({ isModalOpen: false }); 
-     },
+     
      
 	render: function(){
 		
@@ -363,7 +413,7 @@ var RegistryScope = React.createClass({
         <div className="panel-heading">
         <h4 className="panel-title">
           <span style={collapsePanelLink} data-toggle="collapse" data-parent="#accordion" data-target={datatarget}>{this.props.idx}</span>
-          <span className="panel-title pull-right"><a href="#" onClick={this.openCopyScope}><span title="Copy Scope" className="glyphicon glyphicon-share"></span></a><a href="#" onClick={this.onHandleDeleteScope}><span title="delete scope" className="glyphicon glyphicon-remove"></span></a></span>
+          <span className="panel-title pull-right"><a href="#" onClick={this.openCopyScope}><span title="Copy Scope" className="glyphicon glyphicon-share"></span></a><a href="#" onClick={this.confirmDeleteScope}><span title="delete scope" className="glyphicon glyphicon-remove"></span></a></span>
         </h4>
       </div>
       <div id={id} className="panel-collapse collapse">
