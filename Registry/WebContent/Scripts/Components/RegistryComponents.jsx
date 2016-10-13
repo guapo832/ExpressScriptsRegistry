@@ -168,8 +168,7 @@ var RegistryApplication = React.createClass({
    	  	      cache: false,
    	  	      contentType:'application/json',
    	  	      success: function(data) {
-   	  	    	  alert(JSON.stringify(data));
-   	  	     	 newData.ScopeArray.push({scope:newScope.scope,regentries:data.list});
+   	  	    	  newData.ScopeArray.push({scope:newScope.scope,regentries:data.list});
    	  	    	 newData.ScopeAssoc[newScope.scope] = newData.ScopeArray.length-1;
    	  	    	this.setState({data:newData})
    	  	    	
@@ -243,12 +242,29 @@ var RegistryApplication = React.createClass({
      },
      
      deleteEntry:function(entryid){
+    	     var data = this.state.data;
+    	     var newdata = this.state.data;
+    	     var found = false;
+    	     for(var i = 0; i<data.ScopeArray.length; i++){
+    	        for(var j = 0; j<data.ScopeArray[i].regentries.length ; j++){
+    	        	if(data.ScopeArray[i].regentries[j].id == entryid) {
+    	        		found = true;
+    	        		var scope = newdata.ScopeArray[i].regentries[j].scope; //scope this entry lives under
+    	        		newdata.ScopeArray[i].regentries.splice(j,1); //remove item from data
+    	        		break;
+    	        	}
+    	           if(found) break;	
+    	        }
+    	    
+    	     }
+    	     
     	 	 $.ajax({
        	      url: this.props.url + "/registryEntry/" + entryid,
        	      type:'DELETE',
        	      cache: false,
        	      success: function(data) {
-       	    	this.getData(this.state.filterData);
+       	    	//this.getData(this.state.filterData);
+       	    	  this.setState(newdata);
        	      }.bind(this),
        	      error: function(xhr, status, err) {
        	    	  alert(status);
