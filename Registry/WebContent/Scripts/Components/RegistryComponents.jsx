@@ -701,10 +701,6 @@ var RegistryEntryFilterPanel = React.createClass({
 
 //var convertedData =convertData(regentries); 
 
-React.render(
-		    <RegistryApplication url="http://localhost:6969"/>,
-		    document.getElementById('registrycontainer')
-		  );
 
   
 
