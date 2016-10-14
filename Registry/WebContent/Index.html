@@ -25,25 +25,33 @@
  <script type="text/jsx" src="Scripts/Components/RegistryFlatView.jsx"></script>
 <script type="text/jsx">
 
-function showCategory(e){
-	React.render(
-	    <RegistryApplication url="http://localhost:6969"/>,
-	    document.getElementById('registrycontainer')
-	);
-	return false;
+function showCategory() {
+	React.render(<RegistryApplication url="http://localhost:6969"/>, document.getElementById('registrycontainer'));
+ 	$("#showCategory").prop('disabled', true);
+	$("#showflat").prop('disabled', false);
 }
 
-function showFlat(e){
-	React.render(
-	    <RegistryFlatView/>,
-	    document.getElementById('registrycontainer')
-	);
-return false;
+
+function showFlat(){
+    React.render(<RegistryFlatMain url="http://localhost:6969" />, document.getElementById('registrycontainer'));
+    $("#showCategory").prop('disabled', false);
+	$("#showflat").prop('disabled', true);
 }
 
 $(document).ready(function(){
-showCategory();
+	 $("#showCategory").prop('disabled', true);
+ 	 $("#showflat").click(function(event){
+ 		event.preventDefault();
+		showFlat();
+	 });
+	 $("#showCategory").click(function(event){
+		event.preventDefault();
+		showCategory();
+	 });
+	 showCategory();
 });
+
+
 </script>
     
 </head>
@@ -56,7 +64,8 @@ showCategory();
    <h2 style="margin-top:35px">Registry Entries</h2>
   
      
-     <a href="#" onclick="showCategory(this)">Category View</a> | <a href="#" onclick="showFlat(this)">Flat View</a> 
+     <button id="showCategory">Category View</button>
+     <button id="showflat">Flat View</button> 
      <div id="registrycontainer">
       If you are seeing this then a problem occurred.
     </div>

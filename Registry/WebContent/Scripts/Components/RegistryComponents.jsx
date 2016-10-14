@@ -370,7 +370,7 @@ var CopyScopeForm = React.createClass({
    }
 });
 
-var CreateRegistryEntryForm = React.createClass({
+var RegistryEntryForm = React.createClass({
 	render:function(){
 		return (<div>
 		<h1>This form to Needs to be developed by team</h1>
@@ -491,7 +491,7 @@ var RegistryScope = React.createClass({
         
         this.setState({ isModalOpen: true,
         ModalData:<div><h3>CreateEntry</h3> 
-               <CreateRegistryEntryForm/></div>
+               <RegistryEntryForm/></div>
 		});
         
      },
@@ -639,12 +639,8 @@ var RegistryEntry = React.createClass({
     openEditEntry: function(e){
         e.preventDefault();
         this.setState({ isModalOpen: true,
-        ModalData:<div><h3>Edit Entry</h3> 
-               		<div className="body"> 
-                 		<p>This is the modal&apos;s body.</p> 
-               		</div> 
-               		<button onClick={this.closeModal}>Close modal</button>
-               	 </div> 
+        ModalData:<div><h3>CreateEntry</h3> 
+        <RegistryEntryForm/></div>
 		});
         
      },
