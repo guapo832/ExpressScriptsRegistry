@@ -41,25 +41,43 @@ textarea {
 
 /* Animation */
 
-.modal-anim-enter {
-    opacity: 1;
-    transform: scale(0.7);
-    transition: all 0.2s;
+.modal-enter {
+  opacity: 0.01;
 }
 
-.modal-anim-enter.modal-anim-enter-active {
-    opacity: 1;
-    transform: scale(1);
+.modal-enter.modal-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
 }
 
-.modal-anim-leave {
-    opacity: 1;
-    transform: scale(1);
-    transition: all 0.2s;
+.modal-leave {
+  opacity: 1;
 }
 
-.modal-anim-leave.modal-anim-leave-active {
-    opacity: 1;
-    transform: scale(0.7);
+.scopelist-leave.scopelist-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
 }
 
+
+.scopelist-enter {
+  opacity: 0.01;
+}
+
+.scopelist-enter.scopelist-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.scopelist-leave {
+  opacity: 1;
+}
+
+.scopelist-leave.scopelist-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
+
+.tet{
+	color:red;
+}

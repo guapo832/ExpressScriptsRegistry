@@ -14,45 +14,58 @@
  <link href="Content/jasny-bootstrap/css/jasny-bootstrap.min.css" rel="stylesheet"> 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="Content/bootstrap/3.2.0/dist/js/bootstrap.min.js"></script> 
+  <script src="Scripts/modernizr-2.6.2.js"></script>
+  <link href="Content/navmenu-reveal.css" rel="stylesheet">
+     
+ <script src="Content/jasny-bootstrap/js/jasny-bootstrap.min.js"></script>
+<script src="Content/bootstrap/3.2.0/dist/js/bootstrap.min.js"></script>
+    <script src="http://fb.me/react-with-addons-0.12.2.js"></script> 
+ <script src="http://fb.me/JSXTransformer-0.12.2.js"></script> 
+ <script type="text/jsx" src="Scripts/Components/RegistryComponents.jsx"></script>
+ <script type="text/jsx" src="Scripts/Components/RegistryFlatView.jsx"></script>
+<script type="text/jsx">
 
-<script src="Scripts/bootbox.min.js"></script>
+function showCategory(e){
+	React.render(
+	    <RegistryApplication url="http://localhost:6969"/>,
+	    document.getElementById('registrycontainer')
+	);
+	return false;
+}
 
-    <script src="Scripts/modernizr-2.6.2.js"></script>
+function showFlat(e){
+	React.render(
+	    <RegistryFlatView/>,
+	    document.getElementById('registrycontainer')
+	);
+return false;
+}
 
-
-    <link href="Content/navmenu-reveal.css" rel="stylesheet">
+$(document).ready(function(){
+showCategory();
+});
+</script>
     
-    
-
 </head>
 <body>
-    
-    
+ 
+ 
     
     
    <div class="container body-content" style="margin-top:15px">
    <h2 style="margin-top:35px">Registry Entries</h2>
   
      
-     
+     <a href="#" onclick="showCategory(this)">Category View</a> | <a href="#" onclick="showFlat(this)">Flat View</a> 
      <div id="registrycontainer">
       If you are seeing this then a problem occurred.
     </div>
   </div>
  
 
-<!-- <script src="Scripts/lib/reactbuild/react.js"></script> -->
-  <!-- <script src="Scripts/lib/reactbuild/react-dom.js"></script> -->
-<!-- <script src="Scripts/lib/reactbuild/react-with-addons.js"></script>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script> -->
- <script src="http://fb.me/react-with-addons-0.12.2.js"></script> 
- <script src="http://fb.me/JSXTransformer-0.12.2.js"></script> 
+
+
  
- <script src="Content/jasny-bootstrap/js/jasny-bootstrap.min.js"></script>
-<script src="Content/bootstrap/3.2.0/dist/js/bootstrap.min.js"></script>
-
- <script type="text/jsx" src="Scripts/Components/RegistryComponents.jsx"></script>
-
 
     </body>
      
