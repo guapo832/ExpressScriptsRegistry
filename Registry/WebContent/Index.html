@@ -63,11 +63,13 @@ $(document).ready(function(){
    <div class="container body-content" style="margin-top:15px">
    <h2 style="margin-top:35px">Registry Entries</h2>
   
-     
-     <button id="showCategory">Category View</button>
-     <button id="showflat">Flat View</button> 
+     <div style="margin-bottom:25px">
+     <button id="showCategory" class="btn btn-primary">Category View</button>
+     <button id="showflat" class="btn btn-primary">Flat View</button>
+     </div> 
      <div id="registrycontainer">
-      If you are seeing this then a problem occurred.
+      	<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+		<span class="sr-only">Loading...</span> Loading...
     </div>
   </div>
  
