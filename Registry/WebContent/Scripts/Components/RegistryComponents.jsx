@@ -144,7 +144,7 @@ var RegistryApplication = React.createClass({
     	  data = {scope:'',name:'',value:'',confidential:''};
           this.setState({ isModalOpen: true,
           ModalData:<div><h3>Create Registry Entry</h3> 
-          <RegistryEntryForm onSubmit={this.addEntry} onCancel={this.closeModal} data={data} /></div>
+          <RegistryEntryForm onSubmit={this.addEntry} type="POST" url={this.props.url} onCancel={this.closeModal} data={data} /></div>
   		});
           
      },
@@ -241,60 +241,31 @@ var RegistryApplication = React.createClass({
      },
      
      updateEntry:function(entryData){
-        var newData = this.state.data;
-         $.ajax({
-             url: this.props.url + "/registryEntry/" + entryData.id,
-             dataType: 'json',
-             type:'PUT',
-             processData: false,
-             contentType:'application/json',
-             data: JSON.stringify(entryData),
-             cache: false,
-             success: function(data) {
-                var regentries =  newData.ScopeArray[newData.ScopeAssoc[entryData.scope]].regentries
-                for(var i = 0; i<regentries.length; i++){
-                    if(regentries[i].id == entryData.id){
-                        regentries[i] = entryData;
-                         break;
-                    }
-                }
-                this.setState({data: newData});
-             }.bind(this),
-             error: function(xhr, status, err) {
-               console.error(this.props.url, status, err.toString());
-             }.bind(this)
-           });
          
+        var newData = this.state.data;
+        var regentries =  newData.ScopeArray[newData.ScopeAssoc[entryData.scope]].regentries
+        for(var i = 0; i<regentries.length; i++){
+            if(regentries[i].id == entryData.id){
+                regentries[i] = entryData;
+                 break;
+            }
+        }
+        this.setState({data: newData});
+         this.closeModal();
      },
      
-     addEntry:function(entryData){
-         entryData.id = 0;
-         
+     addEntry:function(data){
          var newData = this.state.data;
-         $.ajax({
-             url: this.props.url + "/registryEntry",
-             dataType: 'json',
-             type:'POST',
-             processData: false,
-             contentType:'application/json',
-             data: JSON.stringify(entryData),
-             cache: false,
-             success: function(data) {
-                 
-                 this.closeModal();
-                 
-                 if(typeof(newData.ScopeAssoc[entryData.scope]) == 'undefined'){
-                     newData.ScopeArray.push({scope:entryData.scope,regentries:[]});
-                     newData.ScopeAssoc[entryData.scope] = newData.ScopeArray.length-1;
-                 }
-                    newData.ScopeArray[newData.ScopeAssoc[entryData.scope]].regentries.push(data);
-                this.setState({data: newData});
-                
-             }.bind(this),
-             error: function(xhr, status, err) {
-               console.error(this.props.url, status, err.toString());
-             }.bind(this)
-           });
+         if(typeof(newData.ScopeAssoc[data.scope]) == 'undefined'){
+             newData.ScopeArray.push({scope:data.scope,regentries:[]});
+             newData.ScopeAssoc[data.scope] = newData.ScopeArray.length-1;
+         }
+         newData.ScopeArray[newData.ScopeAssoc[data.scope]].regentries.push(data);
+        this.setState({data: newData});
+        this.closeModal();
+        
+         
+      //   this.closeModal();
      },
      
      deleteEntry:function(entryid){
@@ -340,7 +311,7 @@ var RegistryApplication = React.createClass({
     			<Modal isOpen={this.state.isModalOpen} transitionName="modal-anim">{this.state.ModalData}</Modal> 
     			<RegistryEntryFilterPanel>
     				<FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
-    				<RegistryScopeList deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
+    				<RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
     		</div>
     }
 	
@@ -367,12 +338,11 @@ var RegistryScopeList = React.createClass({
     },
     
     handleUpdateEntry: function(obj,entryData){
-       
         this.props.updateEntryHandler(entryData);
     },
     
     handleAddEntry: function(obj,entryData){
-        this.props.addEntryHandler(entryData);
+       this.props.addEntryHandler(entryData);
     },
     
 	render: function(){
@@ -390,6 +360,7 @@ var RegistryScopeList = React.createClass({
 		    	 		    handleDeleteScope={boundDeleteScope} 
 		    	 		    data={scopes.regentries}
 		    	 		    key={scopes.scope}
+		    	 		    url={this.props.url}
 		    	 		    idx={scopes.scope}
 		    	 		    handleCopyScope={boundCopyScope} />
 		    	      );
@@ -421,7 +392,7 @@ var RegistryScope = React.createClass({
         var data={scope:this.props.idx,name:'',value:'',confidential:false};
        this.setState({ isModalOpen: true,
        ModalData:<div><h3>CreateEntry</h3> 
-              <RegistryEntryForm onSubmit={this.createEntryHandler} onCancel={this.closeModal} data={data}/></div>
+              <RegistryEntryForm onSubmit={this.createEntryHandler} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div>
        });
        
     },
@@ -500,7 +471,7 @@ var RegistryScope = React.createClass({
        <a href="#" onClick={this.openCreateEntry}>
            <span title="Create Entry in this scope" className="glyphicon glyphicon-plus"></span>
        </a> 
-       <RegistryEntryList id={id} deleteEntryHandler={this.onHandleDeleteEntry} updateEntryHandler={this.onHandleUpdateEntry} data={this.props.data}/>
+       <RegistryEntryList id={id} deleteEntryHandler={this.onHandleDeleteEntry} url={this.props.url} updateEntryHandler={this.onHandleUpdateEntry} data={this.props.data}/>
        </div>
        </div></div>);
      
@@ -534,7 +505,7 @@ var RegistryEntryList = React.createClass({
               var boundDeleteEntry = this.handleDeleteEntry.bind(null,this.entry);
               var boundUpdateEntry = this.handleUpdateEntry.bind(null,this.entry)
               return (
-                      <RegistryEntry key={entry.id} data={entry} idx={parent} handleUpdateEntry={boundUpdateEntry} handleDeleteEntry={boundDeleteEntry}/>
+                      <RegistryEntry key={entry.id} data={entry} url={this.props.url} idx={parent} handleUpdateEntry={boundUpdateEntry} handleDeleteEntry={boundDeleteEntry}/>
                       );
              },this);
         return(
@@ -600,7 +571,7 @@ var RegistryEntry = React.createClass({
         e.preventDefault();
         this.setState({ isModalOpen: true,
         ModalData:<div><h3>Edit Registry Entry</h3> 
-        <RegistryEntryForm onSubmit={this.updateEntryHandler} onCancel={this.closeModal} data={this.state.data}/></div>
+        <RegistryEntryForm onSubmit={this.updateEntryHandler} type="PUT" url={this.props.url} onCancel={this.closeModal} data={this.state.data}/></div>
         });
         
      },
@@ -626,7 +597,7 @@ var RegistryEntry = React.createClass({
                         </h4>
                     </div>
                             
-                            <RegistryEntryRead id={this.props.data.id} data={this.state.data}/>
+                            <RegistryEntryRead id={this.props.data.id} data={this.state.data} url={this.props.url}/>
                     
                 </div>
     }
@@ -694,13 +665,35 @@ var RegistryEntryForm = React.createClass({
 	},
 	
 	onSubmitClicked:function(e){
-		e.preventDefault();
+	    e.preventDefault();
 		var name=this.state.name;
 		var scope=this.state.scope;
-		var confidential= this.state.confidential;
-		var id = this.state.id;
-		var value = this.state.value;
-		this.props.onSubmit({id:id, name:name,value:value,scope:scope,confidential:confidential});
+		var confidential= this.state.confidential!=null?this.state.confidential:false;
+		var value = this.state.value
+		var id = typeof(this.props.data.id) != 'undefined'?this.props.data.id:0;
+		var entryData = {id:id, name:name,value:value,scope:scope,confidential:confidential};
+		
+		var murl = this.props.url + "/registryEntry";
+		 var murl = id===0?murl:murl + "/" + id;
+	     $.ajax({
+             url: murl,
+             dataType: 'json',
+             type:this.props.type,
+             processData: false,
+             contentType:'application/json',
+             data: JSON.stringify(entryData),
+             cache: false,
+             success: function(data) {
+                 this.props.onSubmit(data);
+             }.bind(this),
+             error: function(xhr, status, err) {
+                 alert(status);
+                 console.error(murl, status, err.toString());
+             }.bind(this)
+           });
+		
+		
+		
 	},
 	
 	
