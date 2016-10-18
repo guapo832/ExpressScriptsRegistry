@@ -162,6 +162,7 @@ var RegistryApplication = React.createClass({
        this.setState({data:newData})
      },
      
+     test
          
      deleteScope:function(scope){
     	 var newData = this.state.data; 
