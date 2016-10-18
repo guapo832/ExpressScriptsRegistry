@@ -105,7 +105,8 @@ var RegistryApplication = React.createClass({
          return {
         	 isModalOpen: false,
            	 data:convertData([]),
-           	 filterData:{scope:'*',name:'*',value:'*',confidential:'*',sensitive:false,inheritance:false}
+           	 filterData:{scope:'*',name:'*',value:'*',confidential:'*',sensitive:false,inheritance:false},
+             error:''
           }; 
          
      }, 
@@ -125,11 +126,14 @@ var RegistryApplication = React.createClass({
    	      dataType: 'json',
    	      cache: false,
    	      success: function(data) {
+   	          var dataMessage = data.list.length==0?"no Results found":''; 
    	          this.setState({data:convertData([])});
    	          var newData = convertData(data.list);
-   	          this.setState({data:newData,filterData:filterData});
+   	          
+   	          this.setState({data:newData,filterData:filterData,error:dataMessage});
    	      }.bind(this),
    	      error: function(xhr, status, err) {
+   	        this.setState({error:status + err});
    	        console.error(this.props.url, status, err.toString());
    	      }.bind(this)
    	    });
@@ -274,7 +278,7 @@ var RegistryApplication = React.createClass({
     			<Modal isOpen={this.state.isModalOpen} transitionName="modal-anim">{this.state.ModalData}</Modal> 
     			<RegistryEntryFilterPanel>
     			   <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
-    			   <div className="alert alert-danger fade in" id="searchResultsError">put error here</div>
+    			   <div className="alert alert-danger fade in" id="searchResultsError">{this.state.error}</div>
     				<RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
     		</div>
     }
