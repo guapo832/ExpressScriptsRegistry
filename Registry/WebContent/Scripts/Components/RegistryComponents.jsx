@@ -273,7 +273,8 @@ var RegistryApplication = React.createClass({
     			<a href="#" onClick={this.openCreateForm}><span className="glyphicon glyphicon-plus-sign" title="Add Entry"></span></a> 
     			<Modal isOpen={this.state.isModalOpen} transitionName="modal-anim">{this.state.ModalData}</Modal> 
     			<RegistryEntryFilterPanel>
-    				<FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
+    			   <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
+    			   <div className="alert alert-danger fade in" id="searchResultsError">put error here</div>
     				<RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
     		</div>
     }
