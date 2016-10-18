@@ -153,50 +153,13 @@ var RegistryApplication = React.createClass({
      closeModal: function() { 
          this.setState({ isModalOpen: false }); 
      }, 
-     copyScope: function(oldScope,newScope){
-       	var scopeFilterUrl = this.props.url + "/registryEntry?scope=" + oldScope.scope;
-    	var newData = this.state.data;
-     	var destScope = {scope:newScope.scope,regentries:[]};
-    	 $.ajax({
-   	      url: scopeFilterUrl,
-   	      dataType: 'json',
-   	      cache: false,
-   	      success: function(data) {
-   	          scopeData = convertData(data.list);
-   	          var entriestocopy = scopeData.ScopeArray[scopeData.ScopeAssoc[oldScope.scope]].regentries;
-   	         
-   	    	 for(i=0;i<entriestocopy.length;i++){
-   	     		destScope.regentries.push({scope:newScope.scope, name:entriestocopy[i].name,id:0});
-   	     	}
-   	    	var newList = {list:destScope.regentries,totalCount:destScope.regentries.length}
-   	    	
-   	    	$.ajax({
-   	  	      url: this.props.url + "/registryEntry/batch",
-   	  	      type: "POST",
-   	  	      dataType: 'json',
-   	  	      data:JSON.stringify(newList),
-   	  	      processData:false,
-   	  	      cache: false,
-   	  	      contentType:'application/json',
-   	  	      success: function(data) {
-   	  	    	  newData.ScopeArray.push({scope:newScope.scope,regentries:data.list});
-   	  	    	 newData.ScopeAssoc[newScope.scope] = newData.ScopeArray.length-1;
-   	  	    	this.setState({data:newData})
-   	  	    	
-   	  	      }.bind(this),
-   	  	      error: function(xhr, status, err) {
-   	  	    	  alert("Error" + err.toString());
-   	  	    	  alert(JSON.stringify(xhr));
-   	  	        console.error(this.props.url, status, err.toString());
-   	  	      }.bind(this)
-   	  	    });
-   	      }.bind(this),
-   	      error: function(xhr, status, err) {
-   	        console.error(this.props.url, status, err.toString());
-   	      }.bind(this)
-   	    });
-    	
-  	    
+     
+     copyScope: function(data,newScope){
+         
+         var newData = this.state.data;
+         newData.ScopeArray.push({scope:newScope,regentries:data});
+        newData.ScopeAssoc[newScope] = newData.ScopeArray.length-1;
+       this.setState({data:newData})
      },
      
          
@@ -327,8 +290,9 @@ var RegistryScopeList = React.createClass({
     }, 
     
     
-	handleCopyScope: function(obj, oldScope,newScope){
-		this.props.copyScopeHandler(oldScope,newScope)
+	handleCopyScope: function(obj, entryData, oldscope){
+	    
+	    this.props.copyScopeHandler(entryData, oldscope)
     },
     handleDeleteScope: function(obj,scope){
     	this.props.deleteScopeHandler(scope);
@@ -348,11 +312,12 @@ var RegistryScopeList = React.createClass({
 	render: function(){
 		return(<div className="panel-group" id="accordion">
 		{this.props.data.map(function(scopes) {
-		      var boundCopyScope = this.handleCopyScope.bind(null,this,scopes);	
+		      var boundCopyScope = this.handleCopyScope.bind(null,this);	
 		      var boundUpdateEntry = this.handleUpdateEntry.bind(null,this);
 		      var boundDeleteScope = this.handleDeleteScope.bind(null,this.scopes);
 		      var boundDeleteEntry = this.handleDeleteEntry.bind(null,this);
 		      var boundAddEntry = this.handleAddEntry.bind(null,this);
+		      
 		      return (
 		    	 		  <RegistryScope handleDeleteEntry={boundDeleteEntry}
 		    	 		    handleUpdateEntry={boundUpdateEntry}
@@ -403,10 +368,11 @@ var RegistryScope = React.createClass({
       
     },
     
-    onHandleCopyScopeSubmit:function(newScope){
-       this.props.handleCopyScope(newScope);
+    onHandleCopyScopeSubmit:function(data,newScope){
+        this.closeModal();
+        this.props.handleCopyScope(data,newScope);
        //TODO add copy functionality;
-       this.closeModal();
+       
     },
     
     onHandleDeleteScope:function(){
@@ -435,7 +401,7 @@ var RegistryScope = React.createClass({
     openCopyScope: function(e){
        e.preventDefault();
        this.setState({ isModalOpen: true,
-       ModalData:<div><h3>Copy Scope</h3><CopyScopeForm onCancel={this.closeModal} onSubmit={this.onHandleCopyScopeSubmit}/></div>   
+       ModalData:<div><h3>Copy Scope</h3><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.idx} onSubmit={this.onHandleCopyScopeSubmit}/></div>   
               
        });
        
@@ -624,9 +590,52 @@ var CopyScopeForm = React.createClass({
    handleSubmit: function(e){
       //TODO do submit
       e.preventDefault();
+      
+      var scopeFilterUrl = this.props.url + "/registryEntry?scope=" + this.props.scope
       var scope=this.state.scope;
-      //todo send request to server
-      this.props.onSubmit({scope:scope});
+      var destScope = {scope:scope,regentries:[]};
+      
+      $.ajax({
+          url: scopeFilterUrl,
+          dataType: 'json',
+          cache: false,
+          success: function(data) {
+             
+              var scopeData = convertData(data.list);
+              var entriestocopy = scopeData.ScopeArray[scopeData.ScopeAssoc[this.props.scope]].regentries;
+             
+             for(i=0;i<entriestocopy.length;i++){
+                destScope.regentries.push({scope:scope, name:entriestocopy[i].name,id:0});
+            }
+            var newList = {list:destScope.regentries,totalCount:destScope.regentries.length}
+          
+            $.ajax({
+              url: this.props.url + "/registryEntry/batch",
+              type: "POST",
+              dataType: 'json',
+              data:JSON.stringify(newList),
+              processData:false,
+              cache: false,
+              contentType:'application/json',
+              success: function(data) {
+              this.props.onSubmit(data.list,scope)
+              }.bind(this),
+              error: function(xhr, status, err) {
+                  alert("Error" + err.toString());
+                  alert(JSON.stringify(xhr));
+                console.error(this.props.url, status, err.toString());
+              }.bind(this)
+            });
+          }.bind(this),
+          error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+          }.bind(this)
+        });
+        
+      
+      
+      
+      
    },
    render: function(){
       return (<form>
