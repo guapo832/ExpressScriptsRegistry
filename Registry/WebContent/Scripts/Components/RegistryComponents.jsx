@@ -99,13 +99,20 @@ var Modal = React.createClass({
 	}
 });
 
+var ErrorMessage = React.createClass({
+    render:function(){
+        return <div className="alert alert-danger fade in" id="searchResultsError">{this.props.children}</div>
+    }
+})
+
 /* Main application for categorized view */
 var RegistryApplication = React.createClass({
 	getInitialState: function() { 
          return {
         	 isModalOpen: false,
            	 data:convertData([]),
-           	 filterData:{scope:'*',name:'*',value:'*',confidential:'*',sensitive:false,inheritance:false}
+           	 filterData:{scope:'*',name:'*',value:'*',confidential:'*',sensitive:false,inheritance:false},
+             error:''
           }; 
          
      }, 
@@ -125,11 +132,14 @@ var RegistryApplication = React.createClass({
    	      dataType: 'json',
    	      cache: false,
    	      success: function(data) {
+   	          var dataMessage = data.list.length==0?<ErrorMessage>No Results Found</ErrorMessage>:''; 
    	          this.setState({data:convertData([])});
    	          var newData = convertData(data.list);
-   	          this.setState({data:newData,filterData:filterData});
+   	          
+   	          this.setState({data:newData,filterData:filterData,error:dataMessage});
    	      }.bind(this),
    	      error: function(xhr, status, err) {
+   	        this.setState({error:status + err});
    	        console.error(this.props.url, status, err.toString());
    	      }.bind(this)
    	    });
@@ -273,8 +283,9 @@ var RegistryApplication = React.createClass({
     			<a href="#" onClick={this.openCreateForm}><span className="glyphicon glyphicon-plus-sign" title="Add Entry"></span></a> 
     			<Modal isOpen={this.state.isModalOpen} transitionName="modal-anim">{this.state.ModalData}</Modal> 
     			<RegistryEntryFilterPanel>
-    				<FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
-    				<RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
+    			   <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
+    			   {this.state.error}
+    			   <RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
     		</div>
     }
 	
@@ -861,6 +872,9 @@ var ConfirmationForm = React.createClass({
 		);
 	}
 });
+
+
+
 
 /*
  * This will hold a list of all registry entries that
