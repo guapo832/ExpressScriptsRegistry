@@ -162,8 +162,7 @@ var RegistryApplication = React.createClass({
        this.setState({data:newData})
      },
      
-     test
-         
+          lkj    
      deleteScope:function(scope){
     	 var newData = this.state.data; 
     	 var deleteArr = [];
