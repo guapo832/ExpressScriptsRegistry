@@ -99,6 +99,12 @@ var Modal = React.createClass({
 	}
 });
 
+var ErrorMessage = React.createClass({
+    render:function(){
+        return <div className="alert alert-danger fade in" id="searchResultsError">{this.props.children}</div>
+    }
+})
+
 /* Main application for categorized view */
 var RegistryApplication = React.createClass({
 	getInitialState: function() { 
@@ -126,7 +132,7 @@ var RegistryApplication = React.createClass({
    	      dataType: 'json',
    	      cache: false,
    	      success: function(data) {
-   	          var dataMessage = data.list.length==0?"no Results found":''; 
+   	          var dataMessage = data.list.length==0?<ErrorMessage>No Results Found</ErrorMessage>:''; 
    	          this.setState({data:convertData([])});
    	          var newData = convertData(data.list);
    	          
@@ -278,8 +284,8 @@ var RegistryApplication = React.createClass({
     			<Modal isOpen={this.state.isModalOpen} transitionName="modal-anim">{this.state.ModalData}</Modal> 
     			<RegistryEntryFilterPanel>
     			   <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
-    			   <div className="alert alert-danger fade in" id="searchResultsError">{this.state.error}</div>
-    				<RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
+    			   {this.state.error}
+    			   <RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
     		</div>
     }
 	
