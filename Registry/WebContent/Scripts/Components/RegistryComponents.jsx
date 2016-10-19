@@ -787,11 +787,14 @@ var FilterForm = React.createClass({
 		var sensitive = this.state.sensitive;
 		var value = this.state.value;
 		
-		
 		this.props.onSubmit({name:name,value:value,scope:scope,confidential:confidential,inheritance:false,sensitive:false});
 	},
-	
-	
+	//test validate
+	validateName: function(value){
+		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	    return re.test(value);
+	},
+	//save data for when the form is inputed, same for below
 	onNameChange:function(e){
 		this.setState({name: e.target.value});
 	},
@@ -816,47 +819,68 @@ var FilterForm = React.createClass({
 		this.setState({inheritance: e.target.checked});
 	},
 	
+
 	render:function(){
-		return (<form>
-		  <h3>Filter Registry Entries</h3>
-		  <div class="form-group">
-		    <label for="scope">Scope</label>
-		    <input type="text" className="form-control" onChange={this.onScopeChange} id="scope" />
-		  </div>
-		  <div class="form-group">
-		    <label for="name">Name:</label>
-		    <input type="text" onChange={this.onNameChange} className="form-control" id="name" />
-		  </div>
-          <div class="form-group">
-			<label for="value">Value:</label>
-			<input type="text" onChange={this.onValueChange} className="form-control" id="value" />
-     	  </div>
-		  <hr />
-		  <div className="form-group">
-		   <div className="checkbox">
-		    <label><input type="checkbox" id="confidential" onChange={this.onConfidentialChange}  /> Is Confidential</label>
-		  </div>
-		            
-		  <div className="checkbox">
-		    <label><input type="checkbox" id="inheritance" onChange={this.onInheritanceChange} /> Use inheritance</label>
-    	  </div>
-    	  
-    	  <div className="checkbox">
-		    <label><input type = "checkbox" id = "sensitive" onChange={this.onSensitiveChange} /> Case Sensitive</label>
-          </div>
-          </div>
-          
-          <div className="form-group row">
-            <div className="offset-sm-2 col-sm-10">
-              <button type="button" className="btn btn-primary pull-right" onClick={this.onSubmitClicked} >Submit</button>
-            </div>
-          </div>
-          </form>);
-          
-		  
+		return (
+				<form>
+				  <h3>Filter Registry Entries</h3>
+				  
+				  <div class="form-group">
+				    <label for="scope">Scope</label>
+				    <input type="text" className="form-control" onChange={this.onScopeChange} id="scope" />
+				  
+				    <label for="name">Name:</label>
+				    <input type="text" onChange={this.onNameChange} className="form-control" id="name" />
+				  
+					<label for="value">Value:</label>
+					<input type="text" onChange={this.onValueChange} className="form-control" id="value" />
+		     	  </div>
+				  <hr />
+				
+				  <div className="checkbox">
+				    <label><input type="checkbox" id="confidential" onChange={this.onConfidentialChange}  /> Is Confidential</label>
+				  </div>
+				            
+				  <div className="checkbox">
+				    <label><input type="checkbox" id="inheritance" onChange={this.onInheritanceChange} /> Use inheritance</label>
+		    	  </div>
+		    	  
+		    	  <div className="checkbox">
+				    <label><input type = "checkbox" id = "sensitive" onChange={this.onSensitiveChange} /> Case Sensitive</label>
+		          </div>
+		        		         
+		          <div className="form-group row">
+		            <div className="offset-sm-2 col-sm-10">
+		              <button type="button" className="btn btn-primary pull-right" onClick={this.onSubmitClicked} >Submit</button>
+		            </div>
+		          </div>
+		         </form>
+		        );
 	}
+	
 });
 
+var InputError = React.createClass({
+	  getInitialState: function() {
+	    return {
+	      message: 'Input is invalid'
+	    };
+	  },
+	  render: function(){ 
+	    var errorClass = classNames(this.props.className, {
+	      'error_container':   true,
+	      'visible':           this.props.visible,
+	      'invisible':         !this.props.visible
+	    });
+
+	    return (
+	      <div className={errorClass}>
+	        <span>{this.props.errorMessage}</span>
+	      </div>
+	    )
+	  }
+
+	});
 
 /*
  * this dialogue is to confirm deleting entries etc.
