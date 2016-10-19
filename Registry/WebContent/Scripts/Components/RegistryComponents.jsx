@@ -284,14 +284,47 @@ var RegistryApplication = React.createClass({
     			<Modal isOpen={this.state.isModalOpen} transitionName="modal-anim">{this.state.ModalData}</Modal> 
     			<RegistryEntryFilterPanel>
     			   <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
+    			   <ResultCount/>
     			   {this.state.error}
     			   <RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
+    			   <Pagination/>
     		</div>
     }
 	
 	
 });
 
+var ResultCount = React.createClass({
+    render: function(){
+        return <div><h4>Entries Found: 68</h4></div>
+    }
+});
+
+var PaginationLink = React.createClass({
+    render: function(){
+        return(<li className={this.props.className}><a href="#">{this.props.id}</a></li>);
+    }
+});
+
+var Pagination = React.createClass({
+   Pages:[],
+   
+   componentDidMount: function(){
+       for(i = 1 ; i< 6; i++){
+           if(i==1) this.Pages.push({id:i,classname:"active"});
+           else this.Pages.push({id:i,classname:""});
+           
+       }  
+   },
+   render:function(){
+        
+       var pageLinks = this.Pages.map(function(page,key) {
+           return (<PaginationLink key={key} id={page.id} className={page.classname} />);
+          },this);
+       
+       return(<ul className="pagination">{pageLinks}</ul>);
+   } 
+});
 
 /* component that displays a categorized list of  Registry scopes*/
 var RegistryScopeList = React.createClass({
@@ -786,9 +819,10 @@ var FilterForm = React.createClass({
 		var inheritance = this.state.inheritance;
 		var sensitive = this.state.sensitive;
 		var value = this.state.value;
+		var count = this.state.count;
+		var offset = this.state.offset;
 		
-		
-		this.props.onSubmit({name:name,value:value,scope:scope,confidential:confidential,inheritance:false,sensitive:false});
+		this.props.onSubmit({name:name,value:value,scope:scope,confidential:confidential,inheritance:false,sensitive:false,count:count,offset:offset });
 	},
 	
 	
@@ -821,16 +855,22 @@ var FilterForm = React.createClass({
 		  <h3>Filter Registry Entries</h3>
 		  <div class="form-group">
 		    <label for="scope">Scope</label>
-		    <input type="text" className="form-control" onChange={this.onScopeChange} id="scope" />
+		    <input type="text" placeholder="Scope" className="form-control" onChange={this.onScopeChange} id="scope" required />
 		  </div>
 		  <div class="form-group">
 		    <label for="name">Name:</label>
-		    <input type="text" onChange={this.onNameChange} className="form-control" id="name" />
+		    <input type="text" placeholder="Name" onChange={this.onNameChange} className="form-control" id="name" />
 		  </div>
           <div class="form-group">
 			<label for="value">Value:</label>
-			<input type="text" onChange={this.onValueChange} className="form-control" id="value" />
+			<input type="text" placeholder="Value" onChange={this.onValueChange} className="form-control" id="value" />
      	  </div>
+			
+		  <div class="form-group">
+            <label for="name">Max Results Per Page:</label>
+            <input type="number" className="form-control" max="500" value="100" min="0" id="name" />
+          </div>
+			
 		  <hr />
 		  <div className="form-group">
 		   <div className="checkbox">
@@ -848,7 +888,7 @@ var FilterForm = React.createClass({
           
           <div className="form-group row">
             <div className="offset-sm-2 col-sm-10">
-              <button type="button" className="btn btn-primary pull-right" onClick={this.onSubmitClicked} >Submit</button>
+              <button type="submit" className="btn btn-primary pull-right" onClick={this.onSubmitClicked} >Submit</button>
             </div>
           </div>
           </form>);
