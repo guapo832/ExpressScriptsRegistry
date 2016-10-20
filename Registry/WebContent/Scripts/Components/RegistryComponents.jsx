@@ -111,35 +111,37 @@ var RegistryApplication = React.createClass({
          return {
         	 isModalOpen: false,
            	 data:convertData([]),
-           	 filterData:{scope:'*',name:'*',value:'*',confidential:'*',sensitive:false,inheritance:false},
-             error:''
+           	 filterData:{scope:'*',name:'*',value:'*',confidential:'*',sensitive:false,inheritance:false,count:100,offset:0},
+           	resultCount:0,
+           	 error:''
           }; 
          
      }, 
      
+     
+     
      componentDidMount: function(){
-        
-         this.getData(this.state.filterData);
-                
+       
+        this.getData(this.state.filterData);
      },
- 
+    
      
      //get data retrieves registry entries from server
      getData:function(filterData){
-         searchurl = this.props.url + "/registryEntry?scope=" + filterData.scope + "&confidential=" + filterData.confidential + "&name=" + filterData.name + "&value=" + filterData.value + "&useInheritance=" + filterData.inheritance + "&matchCase=" + filterData.sensitive;
+         
+         searchurl = this.props.url + "/registryEntry?scope=" + filterData.scope + "&confidential=" + filterData.confidential + "&name=" + filterData.name + "&value=" + filterData.value + "&useInheritance=" + filterData.inheritance + "&matchCase=" + filterData.sensitive + "&offset=" + filterData.offset + "&count=" + filterData.count;
          $.ajax({
    	      url: searchurl,
    	      dataType: 'json',
    	      cache: false,
    	      success: function(data) {
+   	          this.setState({data:convertData([])})
    	          var dataMessage = data.list.length==0?<ErrorMessage>No Results Found</ErrorMessage>:''; 
-   	          this.setState({data:convertData([])});
    	          var newData = convertData(data.list);
-   	          
-   	          this.setState({data:newData,filterData:filterData,error:dataMessage});
+   	          this.setState({data:newData,filterData:filterData,error:dataMessage,resultCount:data.totalCount});
    	      }.bind(this),
    	      error: function(xhr, status, err) {
-   	        this.setState({error:status + err});
+   	      this.setState({error:status + err});
    	        console.error(this.props.url, status, err.toString());
    	      }.bind(this)
    	    });
@@ -147,7 +149,7 @@ var RegistryApplication = React.createClass({
 
      },
      
-    
+      
       
       openCreateForm: function(e) {
     	  e.preventDefault();
@@ -158,6 +160,7 @@ var RegistryApplication = React.createClass({
   		});
           
      },
+     
      
    
      closeModal: function() { 
@@ -210,7 +213,8 @@ var RegistryApplication = React.createClass({
      },
      
      searchEntries:function(searchData){
-         this.getData(searchData); 
+         searchData.offset = this.state.filterData.offset;
+        this.getData(searchData); 
      },
      
      updateEntry:function(entryData){
@@ -238,7 +242,7 @@ var RegistryApplication = React.createClass({
         this.closeModal();
         
          
-      //   this.closeModal();
+      
      },
      
      deleteEntry:function(entryid){
@@ -276,18 +280,23 @@ var RegistryApplication = React.createClass({
     	 
      },
      
-     
+     newPageHandler:function(newOffset){
+         var filterData = this.state.filterData;
+         filterData.offset = newOffset;
+         this.setState({filterData:filterData});
+         this.getData(filterData);
+     },
  	render: function() {
- 	    
+ 	   
  	    return <div>
     			<a href="#" onClick={this.openCreateForm}><span className="glyphicon glyphicon-plus-sign" title="Add Entry"></span></a> 
     			<Modal isOpen={this.state.isModalOpen} transitionName="modal-anim">{this.state.ModalData}</Modal> 
     			<RegistryEntryFilterPanel>
     			   <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
-    			   <ResultCount/>
+    			   <ResultCount data={this.state.resultCount}/>
     			   {this.state.error}
     			   <RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
-    			   <Pagination/>
+    			   <Pagination getNewPage={this.newPageHandler} resultCount={this.state.resultCount} offset={this.state.filterData.offset} numEntriesPerPage={this.state.filterData.count} />
     		</div>
     }
 	
@@ -296,30 +305,42 @@ var RegistryApplication = React.createClass({
 
 var ResultCount = React.createClass({
     render: function(){
-        return <div><h4>Entries Found: 68</h4></div>
+        return <div><h4>Entries Found: {this.props.data}</h4></div>
     }
 });
 
 var PaginationLink = React.createClass({
+    handleNewPage:function(e){
+        e.preventDefault();
+      this.props.onClick(this.props.id)  
+    },
+        
     render: function(){
-        return(<li className={this.props.className}><a href="#">{this.props.id}</a></li>);
+        return(<li className={this.props.className}><a href="#" onClick={this.handleNewPage}>{this.props.id}</a></li>);
     }
 });
 
 var Pagination = React.createClass({
+   handleNewPage:function(id){
+       var newoffset = this.props.numEntriesPerPage * (id-1);
+       this.props.getNewPage(newoffset);
+   },
    Pages:[],
    
-   componentDidMount: function(){
-       for(i = 1 ; i< 6; i++){
-           if(i==1) this.Pages.push({id:i,classname:"active"});
+   render:function(){
+       this.Pages = [];
+       
+       var numPages = Math.ceil(this.props.resultCount/this.props.numEntriesPerPage);
+       var curPage = Math.floor(this.props.offset/this.props.numEntriesPerPage) + 1
+       
+       for(i = 1  ; i <= numPages; i++){
+           if(i==curPage) this.Pages.push({id:i,classname:"active"});
            else this.Pages.push({id:i,classname:""});
            
-       }  
-   },
-   render:function(){
-        
+       }
+       
        var pageLinks = this.Pages.map(function(page,key) {
-           return (<PaginationLink key={key} id={page.id} className={page.classname} />);
+           return (<PaginationLink onClick={this.handleNewPage} key={key} id={page.id} className={page.classname} />);
           },this);
        
        return(<ul className="pagination">{pageLinks}</ul>);
@@ -809,7 +830,11 @@ var RegistryEntryForm = React.createClass({
  */
 var FilterForm = React.createClass({
 	getInitialState: function(){
-		return {name:'*',value:'*',scope:'*',confidential:'*',inheritance:false,sensitive:false};
+		return {name:'*',value:'*',scope:'*',confidential:'*',inheritance:false,sensitive:false,count:100};
+	},
+	
+	componentDidMount:function(){
+	  this.setState({count:this.props.data.count});  
 	},
 	onSubmitClicked:function(e){
 		e.preventDefault();
@@ -820,9 +845,8 @@ var FilterForm = React.createClass({
 		var sensitive = this.state.sensitive;
 		var value = this.state.value;
 		var count = this.state.count;
-		var offset = this.state.offset;
 		
-		this.props.onSubmit({name:name,value:value,scope:scope,confidential:confidential,inheritance:false,sensitive:false,count:count,offset:offset });
+		this.props.onSubmit({name:name,value:value,scope:scope,confidential:confidential,inheritance:false,sensitive:false,count:count });
 	},
 	
 	
@@ -850,39 +874,43 @@ var FilterForm = React.createClass({
 		this.setState({inheritance: e.target.checked});
 	},
 	
+	onCountChange:function(e){
+	    this.setState({count:e.target.value});
+	},
+	
 	render:function(){
 		return (<form>
 		  <h3>Filter Registry Entries</h3>
 		  <div class="form-group">
 		    <label for="scope">Scope</label>
-		    <input type="text" placeholder="Scope" className="form-control" onChange={this.onScopeChange} id="scope" required />
+		    <input type="text" placeholder="Scope" className="form-control" value={this.state.scope} onChange={this.onScopeChange} id="scope" required />
 		  </div>
 		  <div class="form-group">
 		    <label for="name">Name:</label>
-		    <input type="text" placeholder="Name" onChange={this.onNameChange} className="form-control" id="name" />
+		    <input type="text" placeholder="Name" onChange={this.onNameChange} value={this.state.name} className="form-control" id="name" />
 		  </div>
           <div class="form-group">
 			<label for="value">Value:</label>
-			<input type="text" placeholder="Value" onChange={this.onValueChange} className="form-control" id="value" />
+			<input type="text" placeholder="Value" onChange={this.onValueChange} value={this.state.value} className="form-control" id="value" />
      	  </div>
 			
 		  <div class="form-group">
             <label for="name">Max Results Per Page:</label>
-            <input type="number" className="form-control" max="500" value="100" min="0" id="name" />
+            <input type="number" value={this.state.count} onChange={this.onCountChange} className="form-control" max="500" min="0" id="name" />
           </div>
 			
 		  <hr />
 		  <div className="form-group">
 		   <div className="checkbox">
-		    <label><input type="checkbox" id="confidential" onChange={this.onConfidentialChange}  /> Is Confidential</label>
+		    <label><input type="checkbox" id="confidential" onChange={this.onConfidentialChange} checked={this.state.confidential}  /> Is Confidential</label>
 		  </div>
 		            
 		  <div className="checkbox">
-		    <label><input type="checkbox" id="inheritance" onChange={this.onInheritanceChange} /> Use inheritance</label>
+		    <label><input type="checkbox" id="inheritance" onChange={this.onInheritanceChange} checked={this.state.inheritance} /> Use inheritance</label>
     	  </div>
     	  
     	  <div className="checkbox">
-		    <label><input type = "checkbox" id = "sensitive" onChange={this.onSensitiveChange} /> Case Sensitive</label>
+		    <label><input type = "checkbox" id = "sensitive" onChange={this.onSensitiveChange} checked={this.state.sensitive} /> Case Sensitive</label>
           </div>
           </div>
           
@@ -931,14 +959,25 @@ var RegistryEntryRead = React.createClass({
   render: function() {
     return  <div id={this.props.id} className="panel-collapse collapse">
     			<div className="panel-body">
-    				Name: blah<br />
-    				entryid: {this.props.data.id}<br />
-    				Confidential
-    				<h1>Registry Entry (Read Only)</h1>
+    				<RegistryEntryDispForm data={this.props.data} />
        			</div>
        		</div>
   
 
+  }
+});
+
+/*
+ * this is the display view of a registry entry
+ */
+var RegistryEntryDispForm= React.createClass({
+  render: function() {
+    return  <div>
+    Name: blah<br />
+    entryid: {this.props.data.id}<br />
+    Confidential
+    <h1>Registry Entry (Read Only)</h1>
+</div>
   }
 });
 
