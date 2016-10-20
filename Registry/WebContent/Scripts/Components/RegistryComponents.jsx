@@ -198,8 +198,8 @@ var RegistryApplication = React.createClass({
          	    	 this.getData(this.state.filterData);
          	      }.bind(this),
          	      error: function(xhr, status, err) {
-         	    	  alert(status);
-         	    	  alert(err.toString());
+         	    	  alert(err.toString() + status);
+         	    	  
          	        console.error(this.props.url, status, err.toString());
          	      }.bind(this)
          	    });
