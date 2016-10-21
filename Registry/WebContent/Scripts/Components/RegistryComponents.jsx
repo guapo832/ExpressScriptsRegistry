@@ -294,7 +294,7 @@ var RegistryApplication = React.createClass({
                 <RegistryEntryFilterPanel>
                    <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
                    <ResultCount data={this.state.resultCount}/>
-                   {this.state.error}
+                  <ErrorMessage>{this.state.error}</ErrorMessage>
                    <RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
                    <Pagination getNewPage={this.newPageHandler} resultCount={this.state.resultCount} offset={this.state.filterData.offset} numEntriesPerPage={this.state.filterData.count} />
             </div>
@@ -531,7 +531,7 @@ var RegistryEntryList = React.createClass({
     },
     render: function(){
          var parent="accordion" + this.props.id;    
-    
+      
         var items = this.state.data.map(function(entry) {
               var boundDeleteEntry = this.handleDeleteEntry.bind(null,this.entry);
               var boundUpdateEntry = this.handleUpdateEntry.bind(null,this.entry)
@@ -542,7 +542,7 @@ var RegistryEntryList = React.createClass({
         return(
         
         
-        <div className="panel-group" id="accordion">
+        <div className="panel-group" id={parent}>
         {items}
         </div>
         
@@ -726,7 +726,7 @@ var CopyScopeForm = React.createClass({
  */
 var RegistryEntryForm = React.createClass({
     getInitialState: function(){
-        return {name:'',value:'',scope:'',confidential:'', id:0};
+        return {name:'',value:'',scope:'',confidential:'', id:0,};
     },
     
     componentDidMount: function(){
@@ -761,6 +761,7 @@ var RegistryEntryForm = React.createClass({
                  this.props.onSubmit(data);
              }.bind(this),
              error: function(xhr, status, err) {
+                 this.setState(err)
                  alert(status);
                  console.error(murl, status, err.toString());
              }.bind(this)
@@ -791,7 +792,7 @@ var RegistryEntryForm = React.createClass({
     
     render:function(){
         return (<form>
-          <div class="form-group">
+         <div class="form-group">
             <label for="scope">Scope</label>
             <input type="text" className="form-control" onChange={this.onScopeChange} id="scope" value={this.state.scope} />
           </div>
@@ -830,7 +831,7 @@ var RegistryEntryForm = React.createClass({
  */
 var FilterForm = React.createClass({
     getInitialState: function(){
-        return {name:'*',value:'*',scope:'*',confidential:'*',inheritance:false,sensitive:false,count:100};
+        return {name:'*',value:'*',scope:'*',confidential:'*',inheritance:false,sensitive:false,count:100,valid:true};
     },
     
     componentDidMount:function(){
@@ -851,7 +852,8 @@ var FilterForm = React.createClass({
     
     
     onNameChange:function(e){
-        this.setState({name: e.target.value});
+        var valid=true
+        this.setState({name: e.target.value,valid:valid});
     },
     
     onScopeChange:function(e){
@@ -880,6 +882,7 @@ var FilterForm = React.createClass({
     
     render:function(){
         return (<form>
+        <ErrorMessage>{this.state.errormessage}</ErrorMessage>
           <h3>Filter Registry Entries</h3>
           <div class="form-group">
             <label for="scope">Scope</label>
@@ -916,7 +919,7 @@ var FilterForm = React.createClass({
           
           <div className="form-group row">
             <div className="offset-sm-2 col-sm-10">
-              <button type="submit" className="btn btn-primary pull-right" onClick={this.onSubmitClicked} >Submit</button>
+              <button type="submit" className="btn btn-primary pull-right" enabled={this.state.valid} onClick={this.onSubmitClicked} >Submit</button>
             </div>
           </div>
           </form>);
@@ -956,7 +959,10 @@ var ConfirmationForm = React.createClass({
  * this is the readonly view of a registry entry
  */
 var RegistryEntryRead = React.createClass({
+    
   render: function() {
+      
+      
     return  <div id={this.props.id} className="panel-collapse collapse">
                 <div className="panel-body">
                     <RegistryEntryDispForm data={this.props.data} />
@@ -971,11 +977,14 @@ var RegistryEntryRead = React.createClass({
  * this is the display view of a registry entry
  */
 var RegistryEntryDispForm= React.createClass({
+    
   render: function() {
+    var confidential= this.props.data.confidential?"checked":"";  
     return  <div>
-    Name: blah<br />
+    Name: {this.props.data.name}<br />
+    Value: {this.props.data.value}<br />
     entryid: {this.props.data.id}<br />
-    Confidential
+    Confidential <input type="checkbox" checked={confidential} disabled="disabled"/>
     <h1>Registry Entry (Read Only)</h1>
 </div>
   }
