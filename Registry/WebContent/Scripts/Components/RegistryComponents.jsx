@@ -141,7 +141,8 @@ var RegistryApplication = React.createClass({
               this.setState({data:newData,filterData:filterData,error:dataMessage,resultCount:data.totalCount});
           }.bind(this),
           error: function(xhr, status, err) {
-          this.setState({error:status + err});
+              var dataMessage = <ErrorMessage>{err.toString()}</ErrorMessage>
+          this.setState({error:dataMessage});
             console.error(this.props.url, status, err.toString());
           }.bind(this)
         });
@@ -267,7 +268,6 @@ var RegistryApplication = React.createClass({
               type:'DELETE',
               cache: false,
               success: function(data) {
-                //this.getData(this.state.filterData);
                   this.setState(newdata);
               }.bind(this),
               error: function(xhr, status, err) {
@@ -294,7 +294,7 @@ var RegistryApplication = React.createClass({
                 <RegistryEntryFilterPanel>
                    <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
                    <ResultCount data={this.state.resultCount}/>
-                  <ErrorMessage>{this.state.error}</ErrorMessage>
+                 {this.state.error}
                    <RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
                    <Pagination getNewPage={this.newPageHandler} resultCount={this.state.resultCount} offset={this.state.filterData.offset} numEntriesPerPage={this.state.filterData.count} />
             </div>
