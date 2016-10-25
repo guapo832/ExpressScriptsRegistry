@@ -99,6 +99,8 @@ var Modal = React.createClass({
     }
 });
 
+
+
 var ErrorMessage = React.createClass({
     render:function(){
         return <div className="alert alert-danger fade in" id="searchResultsError">{this.props.children}</div>
@@ -128,6 +130,9 @@ var RegistryApplication = React.createClass({
      
      //get data retrieves registry entries from server
      getData:function(filterData){
+         this.setState({ isModalOpen: true,
+             ModalData:<div ><i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only"></span> Working...</div>
+           });
          
          searchurl = this.props.url + "/registryEntry?scope=" + filterData.scope + "&confidential=" + filterData.confidential + "&name=" + filterData.name + "&value=" + filterData.value + "&useInheritance=" + filterData.inheritance + "&matchCase=" + filterData.sensitive + "&offset=" + filterData.offset + "&count=" + filterData.count;
          $.ajax({
@@ -135,10 +140,11 @@ var RegistryApplication = React.createClass({
           dataType: 'json',
           cache: false,
           success: function(data) {
-              this.setState({data:convertData([])})
+              
+              this.setState({data:convertData([]),isModalOpen:false})
               var dataMessage = data.list.length==0?<ErrorMessage>No Results Found</ErrorMessage>:''; 
               var newData = convertData(data.list);
-              this.setState({data:newData,filterData:filterData,error:dataMessage,resultCount:data.totalCount});
+              this.setState({data:newData,filterData:filterData,error:dataMessage,resultCount:data.totalCount,isModalOpen:false});
           }.bind(this),
           error: function(xhr, status, err) {
               var dataMessage = <ErrorMessage>{err.toString()}</ErrorMessage>
@@ -173,7 +179,7 @@ var RegistryApplication = React.createClass({
          var newData = this.state.data;
          newData.ScopeArray.push({scope:newScope,regentries:data});
         newData.ScopeAssoc[newScope] = newData.ScopeArray.length-1;
-       this.setState({data:newData})
+       this.setState({data:newData,resultCount:this.state.resultCount + newData.ScopeArray.length})
      },
      
          
@@ -239,7 +245,7 @@ var RegistryApplication = React.createClass({
              newData.ScopeAssoc[data.scope] = newData.ScopeArray.length-1;
          }
          newData.ScopeArray[newData.ScopeAssoc[data.scope]].regentries.push(data);
-        this.setState({data: newData});
+        this.setState({data: newData,resultCount:this.state.resultCount+1});
         this.closeModal();
         
          
@@ -280,10 +286,59 @@ var RegistryApplication = React.createClass({
          
      },
      
+     getScopeEntries:function(scope){
+         
+         var newData = this.state.data;
+ 
+        var  searchurl = this.props.url + "/registryEntry?scope=" + scope + "&confidential=*&name=*&value=*&matchCase=false";
+        $.ajax({
+         url: searchurl,
+         dataType: 'json',
+         cache: false,
+         success: function(data) {
+            
+            var resultCount = this.state.resultCount;
+            //newData.ScopeArray[0].regentries = null;
+            for(var i = 0; i< newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.length; i++){
+                newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.splice(0,1);
+                resultCount--;
+            }
+            
+            for(var i = 0; i< data.list.length; i++){
+                newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.push(data.list[i]);
+                resultCount++;
+            }
+            
+            //var newList=[{id:23,name:'test',value:'test',confidential:true,scope:'Scope1'}];
+           // newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.concat(newList);
+            
+             this.setState({data: newData,resultCount:this.state.resultCount+1}); 
+            
+            
+         }.bind(this),
+         error: function(xhr, status, err) {
+             alert(err)
+         }.bind(this)
+       });
+       
+      
+         
+               
+               
+          
+        
+        
+         
+        
+             
+          
+         
+     },
+     
      newPageHandler:function(newOffset){
          var filterData = this.state.filterData;
          filterData.offset = newOffset;
-         this.setState({filterData:filterData});
+         this.setState({filterData:filterData,resultCount:this.state.resultCount-1});
          this.getData(filterData);
      },
     render: function() {
@@ -295,7 +350,7 @@ var RegistryApplication = React.createClass({
                    <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
                    <ResultCount data={this.state.resultCount}/>
                  {this.state.error}
-                   <RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
+                   <RegistryScopeList url={this.props.url} getScopeEntries={this.getScopeEntries} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data}/>
                    <Pagination getNewPage={this.newPageHandler} resultCount={this.state.resultCount} offset={this.state.filterData.offset} numEntriesPerPage={this.state.filterData.count} />
             </div>
     }
@@ -349,11 +404,6 @@ var Pagination = React.createClass({
 
 /* component that displays a categorized list of  Registry scopes*/
 var RegistryScopeList = React.createClass({
-    getInitialState: function() { 
-        return {data:this.props.data}; 
-        
-    }, 
-    
     
     handleCopyScope: function(obj, entryData, oldscope){
         
@@ -374,25 +424,31 @@ var RegistryScopeList = React.createClass({
        this.props.addEntryHandler(entryData);
     },
     
+    handleUpdateScope:function(obj,scope){
+       this.props.getScopeEntries(scope);
+    },
+    
     render: function(){
         return(<div className="panel-group" id="accordion">
-        {this.props.data.map(function(scopes) {
+        {this.props.data.ScopeArray.map(function(scopes) {
               var boundCopyScope = this.handleCopyScope.bind(null,this);    
               var boundUpdateEntry = this.handleUpdateEntry.bind(null,this);
               var boundDeleteScope = this.handleDeleteScope.bind(null,this.scopes);
               var boundDeleteEntry = this.handleDeleteEntry.bind(null,this);
               var boundAddEntry = this.handleAddEntry.bind(null,this);
-              
+              var boundUpdateScope = this.handleUpdateScope.bind(null,this);
               return (
                           <RegistryScope handleDeleteEntry={boundDeleteEntry}
                             handleUpdateEntry={boundUpdateEntry}
                             handleAddEntry = {boundAddEntry}
-                            handleDeleteScope={boundDeleteScope} 
+                            handleDeleteScope={boundDeleteScope}
+                            updateScope={boundUpdateScope}
                             data={scopes.regentries}
                             key={scopes.scope}
                             url={this.props.url}
                             idx={scopes.scope}
-                            handleCopyScope={boundCopyScope} />
+                            handleCopyScope={boundCopyScope}
+                            />
                       );
              },this)}
         </div>
@@ -405,7 +461,9 @@ var RegistryScopeList = React.createClass({
 var RegistryScope = React.createClass({
     getInitialState: function() { 
         return { isModalOpen: false,
-               ModalData:null
+               ModalData:null,
+               showAllLink:'',
+               data:this.props.data
          }; 
         
     }, 
@@ -472,21 +530,50 @@ var RegistryScope = React.createClass({
        
     },
     
+    onShowAllClick:function(e){
+        e.preventDefault(); 
+        this.props.updateScope(this.props.idx);
+        this.setState({showAllLink:''});
+    },
+    setShowAllLink:function(e){
+        
+        
+        var  searchurl = this.props.url + "/registryEntry?scope=" + $(e.target).text() + "&confidential=*&name=*&value=*&matchCase=false";
+        $.ajax({
+         url: searchurl,
+         dataType: 'json',
+         cache: false,
+         success: function(data) {
+             if(this.state.data.length < data.totalCount)
+                 {
+                  this.setState({showAllLink:<a href="#" className="pull-right" onClick={this.onShowAllClick}>Show All</a>});
+                 }
+            
+             
+         }.bind(this),
+         error: function(xhr, status, err) {
+             alert(err)
+         }.bind(this)
+       });
+       
+    },
+    
+    
     
    render: function(){
        
-      
        var id = this.props.idx.replace(/\//g,'_'); //id will be used in bootstrap panels, so that each panel has a unique id.
        var datatarget= "#" + id;
        
        
-       return (<div className="panel panel-primary">
+       
+       return (<div className="panel panel-primary" >
         <Modal isOpen={this.state.isModalOpen} transitionName="modal-anim"> 
              {this.state.ModalData} 
        </Modal> 
        <div className="panel-heading">
        <h4 className="panel-title">
-         <span style={collapsePanelLink} data-toggle="collapse" data-parent="#accordion" data-target={datatarget}>{this.props.idx}</span>
+         <span style={collapsePanelLink} data-toggle="collapse" data-parent="#accordion" data-target={datatarget} onClick={this.setShowAllLink}>{this.props.idx}</span>
          <span className="panel-title pull-right">
              <a href="#" onClick={this.openCopyScope}>
                  <span title="Copy Scope" className="glyphicon glyphicon-share"></span>
@@ -502,7 +589,9 @@ var RegistryScope = React.createClass({
        <a href="#" onClick={this.openCreateEntry}>
            <span title="Create Entry in this scope" className="glyphicon glyphicon-plus"></span>
        </a> 
-       <RegistryEntryList id={id} deleteEntryHandler={this.onHandleDeleteEntry} url={this.props.url} updateEntryHandler={this.onHandleUpdateEntry} data={this.props.data}/>
+       {this.state.showAllLink}
+       <RegistryEntryList id={id} deleteEntryHandler={this.onHandleDeleteEntry} url={this.props.url} updateEntryHandler={this.onHandleUpdateEntry} data={this.state.data}/>
+       
        </div>
        </div></div>);
      
@@ -517,9 +606,11 @@ var RegistryEntryList = React.createClass({
     getInitialState: function() { 
         return { data:[]}; 
         
-    },     
+    },   
     
-    componentDidMount:function(){
+    
+    
+    componentDidMount:function(nextprops){
         this.setState({data:this.props.data});  
      },
 
