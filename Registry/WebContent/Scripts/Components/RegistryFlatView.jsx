@@ -16,7 +16,10 @@ var RegistryListFlatView= React.createClass({
 
 render:function(){
 	return(<div>
+	<RegistryEntryFilterPanel>
+	   <FilterForm/></RegistryEntryFilterPanel >
 	<h3>Component Example</h3>
+	<ResultCount />
 	<p>Place plain html here for flat view mockup... Once we have a static html representation of the flat view here. we can
 	The view should be a tabular representation of every registry entry . Please include links for creating/updating/deleting records. they do not have to contain actual click through yet.
 	</p>
@@ -34,6 +37,7 @@ render:function(){
 	<tr><td>some category</td><td>some name</td><td>some value</td></tr>
 	<tr><td>some category</td><td>some name</td><td>some value</td></tr>
 	</tbody></table>
+	<Pagination/>
 	</div>);
 }
 });
