@@ -430,7 +430,7 @@ var RegistryScopeList = React.createClass({
     
     render: function(){
         return(<div className="panel-group" id="accordion">
-        {this.props.data.ScopeArray.map(function(scopes) {
+        {this.props.data.ScopeArray.map(function(scopes,idx) {
               var boundCopyScope = this.handleCopyScope.bind(null,this);    
               var boundUpdateEntry = this.handleUpdateEntry.bind(null,this);
               var boundDeleteScope = this.handleDeleteScope.bind(null,this.scopes);
@@ -444,9 +444,10 @@ var RegistryScopeList = React.createClass({
                             handleDeleteScope={boundDeleteScope}
                             updateScope={boundUpdateScope}
                             data={scopes.regentries}
-                            key={scopes.scope}
+                            key={idx}
                             url={this.props.url}
-                            idx={scopes.scope}
+                            idx={"scope" +idx}
+                            scope={scopes.scope}
                             handleCopyScope={boundCopyScope}
                             />
                       );
@@ -477,7 +478,7 @@ var RegistryScope = React.createClass({
 
     openCreateEntry: function(e){
         e.preventDefault();
-        var data={scope:this.props.idx,name:'',value:'',confidential:false};
+        var data={scope:this.props.scope,name:'',value:'',confidential:false};
        this.setState({ isModalOpen: true,
        ModalData:<div><h3>CreateEntry</h3> 
               <RegistryEntryForm onSubmit={this.createEntryHandler} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div>
@@ -500,7 +501,7 @@ var RegistryScope = React.createClass({
     
     onHandleDeleteScope:function(){
         this.closeModal();
-        this.props.handleDeleteScope(this.props.idx)
+        this.props.handleDeleteScope(this.props.scope)
     },
     
     onHandleDeleteEntry:function(entryId){
@@ -524,7 +525,7 @@ var RegistryScope = React.createClass({
     openCopyScope: function(e){
        e.preventDefault();
        this.setState({ isModalOpen: true,
-       ModalData:<div><h3>Copy Scope</h3><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.idx} onSubmit={this.onHandleCopyScopeSubmit}/></div>   
+       ModalData:<div><h3>Copy Scope</h3><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.scope} onSubmit={this.onHandleCopyScopeSubmit}/></div>   
               
        });
        
@@ -532,19 +533,19 @@ var RegistryScope = React.createClass({
     
     onShowAllClick:function(e){
         e.preventDefault(); 
-        this.props.updateScope(this.props.idx);
+        this.props.updateScope(this.props.scope);
         this.setState({showAllLink:''});
     },
     setShowAllLink:function(e){
-        
-        
+        e.preventDefault()
         var  searchurl = this.props.url + "/registryEntry?scope=" + $(e.target).text() + "&confidential=*&name=*&value=*&matchCase=false";
         $.ajax({
          url: searchurl,
          dataType: 'json',
          cache: false,
          success: function(data) {
-             if(this.state.data.length < data.totalCount)
+             
+         if(this.state.data.length < data.totalCount)
                  {
                   this.setState({showAllLink:<a href="#" className="pull-right" onClick={this.onShowAllClick}>Show All</a>});
                  }
@@ -562,7 +563,7 @@ var RegistryScope = React.createClass({
     
    render: function(){
        
-       var id = this.props.idx.replace(/\//g,'_'); //id will be used in bootstrap panels, so that each panel has a unique id.
+       var id = this.props.idx.replace(/[\/\s]/g,'_'); //id will be used in bootstrap panels, so that each panel has a unique id.
        var datatarget= "#" + id;
        
        
@@ -573,7 +574,7 @@ var RegistryScope = React.createClass({
        </Modal> 
        <div className="panel-heading">
        <h4 className="panel-title">
-         <span style={collapsePanelLink} data-toggle="collapse" data-parent="#accordion" data-target={datatarget} onClick={this.setShowAllLink}>{this.props.idx}</span>
+         <span style={collapsePanelLink} data-toggle="collapse" data-parent="#accordion" data-target={datatarget} onClick={this.setShowAllLink}>{this.props.scope}</span>
          <span className="panel-title pull-right">
              <a href="#" onClick={this.openCopyScope}>
                  <span title="Copy Scope" className="glyphicon glyphicon-share"></span>
