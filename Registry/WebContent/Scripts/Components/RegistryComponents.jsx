@@ -6,98 +6,100 @@ var collapsePanelLink={
 }
 
 var filterPanelStyle = {
-		padding:'10px',
+        padding:'10px',
 }
 
 var modalStyle = {
-		  position: 'fixed',
-		  fontFamily: 'Arial, Helvetica, sans-serif',
-		  top: 0,
-		  right: 0,
-		  bottom: 0,
-		  left: 0,
-		  background: 'rgba(0, 0, 0, 0.8)',
-		  zIndex: 99999,
-		  transition: 'opacity 1s ease-in',
-		  pointerEvents: 'auto',
-		  overflowY: 'auto'
-		}
+          position: 'fixed',
+          fontFamily: 'Arial, Helvetica, sans-serif',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          zIndex: 99999,
+          transition: 'opacity 1s ease-in',
+          pointerEvents: 'auto',
+          overflowY: 'auto'
+        }
 
-		var containerStyle = {
-		  width: '600px',
-		  height:'auto',
-		  position: 'relative',
-		  margin: '10% auto',
-		  padding: '5px 20px 13px 20px',
-		  background: '#fff'
-		}
+        var containerStyle = {
+          width: '600px',
+          height:'auto',
+          position: 'relative',
+          margin: '10% auto',
+          padding: '5px 20px 13px 20px',
+          background: '#fff'
+        }
 
-		var closeStyle = {
-		  background: '#606061',
-		  color: '#FFFFFF',
-		  lineHeight: '25px',
-		  position: 'absolute',
-		  right: '-12px',
-		  textAlign: 'center',
-		  top: '-10px',
-		  width: '24px',
-		  textDecoration: 'none',
-		  fontWeight: 'bold',
-		  borderRadius: '12px',
-		  boxShadow: '1px 1px 3px #000',
-		  cursor: 'pointer'
-		}
+        var closeStyle = {
+          background: '#606061',
+          color: '#FFFFFF',
+          lineHeight: '25px',
+          position: 'absolute',
+          right: '-12px',
+          textAlign: 'center',
+          top: '-10px',
+          width: '24px',
+          textDecoration: 'none',
+          fontWeight: 'bold',
+          borderRadius: '12px',
+          boxShadow: '1px 1px 3px #000',
+          cursor: 'pointer'
+        }
 
 
 
       var inlineStyle={
-			display:"inline"
-		}
+            display:"inline"
+        }
 
 
 function convertData(indata){
-	var scopeArray=[];
-	var scopeAssoc={};
-	var idx=0;
-	for(var i=0;i<indata.length;i++){
-		if(typeof(scopeAssoc[indata[i].scope]) == 'undefined'){
-			scopeAssoc[indata[i].scope] = idx;
-			scopeArray.push({scope:indata[i].scope,regentries:[indata[i]]});
+    var scopeArray=[];
+    var scopeAssoc={};
+    var idx=0;
+    for(var i=0;i<indata.length;i++){
+        if(typeof(scopeAssoc[indata[i].scope]) == 'undefined'){
+            scopeAssoc[indata[i].scope] = idx;
+            scopeArray.push({scope:indata[i].scope,regentries:[indata[i]]});
             idx++;
-		}else{
-		    scopeArray[scopeAssoc[indata[i].scope]].regentries.push(indata[i]);
-		}
-	}
-	return {ScopeArray:scopeArray,ScopeAssoc:scopeAssoc};
+        }else{
+            scopeArray[scopeAssoc[indata[i].scope]].regentries.push(indata[i]);
+        }
+    }
+    return {ScopeArray:scopeArray,ScopeAssoc:scopeAssoc};
 }
 /* end styles used in react */
 
 
 /*Modal is used to do popup forms and dialogs */
 var Modal = React.createClass({
-	render: function() {
-	if(this.props.isOpen){
-		return (<ReactCSSTransitionGroup 
-			transitionName='modal'
-			transitionEnterTimeout={1000}
-			transitionLeaveTimeout={1000}
-			transitionAppear={true} >
-					<div>
-						<div style={modalStyle}>
-							<div style={containerStyle}>
-								{this.props.children}
-							</div>
-						</div> 
-					</div>
-				</ReactCSSTransitionGroup>
-		        
+    render: function() {
+    if(this.props.isOpen){
+        return (<ReactCSSTransitionGroup 
+            transitionName='modal'
+            transitionEnterTimeout={1000}
+            transitionLeaveTimeout={1000}
+            transitionAppear={true} >
+                    <div>
+                        <div style={modalStyle}>
+                            <div style={containerStyle}>
+                                {this.props.children}
+                            </div>
+                        </div> 
+                    </div>
+                </ReactCSSTransitionGroup>
+                
        );
     } else {
-    	return null;
+        return null;
     }
-	    
-	}
+        
+    }
 });
+
+
 
 var ErrorMessage = React.createClass({
     render:function(){
@@ -107,57 +109,65 @@ var ErrorMessage = React.createClass({
 
 /* Main application for categorized view */
 var RegistryApplication = React.createClass({
-	getInitialState: function() { 
+    getInitialState: function() { 
          return {
-        	 isModalOpen: false,
-           	 data:convertData([]),
-           	 filterData:{scope:'*',name:'*',value:'*',confidential:'*',sensitive:false,inheritance:false},
+             isModalOpen: false,
+             data:convertData([]),
+             filterData:{scope:'*',name:'*',value:'*',confidential:'*',sensitive:false,inheritance:false,count:100,offset:0},
+            resultCount:0,
              error:''
           }; 
          
      }, 
      
+     
+     
      componentDidMount: function(){
-        
-         this.getData(this.state.filterData);
-                
+       
+        this.getData(this.state.filterData);
      },
- 
+    
      
      //get data retrieves registry entries from server
      getData:function(filterData){
-         searchurl = this.props.url + "/registryEntry?scope=" + filterData.scope + "&confidential=" + filterData.confidential + "&name=" + filterData.name + "&value=" + filterData.value + "&useInheritance=" + filterData.inheritance + "&matchCase=" + filterData.sensitive;
+         this.setState({ isModalOpen: true,
+             ModalData:<div ><i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only"></span> Working...</div>
+           });
+         
+         searchurl = this.props.url + "/registryEntry?scope=" + filterData.scope + "&confidential=" + filterData.confidential + "&name=" + filterData.name + "&value=" + filterData.value + "&useInheritance=" + filterData.inheritance + "&matchCase=" + filterData.sensitive + "&offset=" + filterData.offset + "&count=" + filterData.count;
          $.ajax({
-   	      url: searchurl,
-   	      dataType: 'json',
-   	      cache: false,
-   	      success: function(data) {
-   	          var dataMessage = data.list.length==0?<ErrorMessage>No Results Found</ErrorMessage>:''; 
-   	          this.setState({data:convertData([])});
-   	          var newData = convertData(data.list);
-   	          
-   	          this.setState({data:newData,filterData:filterData,error:dataMessage});
-   	      }.bind(this),
-   	      error: function(xhr, status, err) {
-   	        this.setState({error:status + err});
-   	        console.error(this.props.url, status, err.toString());
-   	      }.bind(this)
-   	    });
+          url: searchurl,
+          dataType: 'json',
+          cache: false,
+          success: function(data) {
+              
+              this.setState({data:convertData([]),isModalOpen:false})
+              var dataMessage = data.list.length==0?<ErrorMessage>No Results Found</ErrorMessage>:''; 
+              var newData = convertData(data.list);
+              this.setState({data:newData,filterData:filterData,error:dataMessage,resultCount:data.totalCount,isModalOpen:false});
+          }.bind(this),
+          error: function(xhr, status, err) {
+              var dataMessage = <ErrorMessage>{err.toString()}</ErrorMessage>
+          this.setState({error:dataMessage});
+            console.error(this.props.url, status, err.toString());
+          }.bind(this)
+        });
 
 
      },
      
-    
+      
       
       openCreateForm: function(e) {
-    	  e.preventDefault();
-    	  data = {scope:'',name:'',value:'',confidential:''};
+          e.preventDefault();
+          data = {scope:'',name:'',value:'',confidential:''};
           this.setState({ isModalOpen: true,
           ModalData:<div><h3>Create Registry Entry</h3> 
           <RegistryEntryForm onSubmit={this.addEntry} type="POST" url={this.props.url} onCancel={this.closeModal} data={data} /></div>
-  		});
+        });
           
      },
+     
      
    
      closeModal: function() { 
@@ -169,48 +179,49 @@ var RegistryApplication = React.createClass({
          var newData = this.state.data;
          newData.ScopeArray.push({scope:newScope,regentries:data});
         newData.ScopeAssoc[newScope] = newData.ScopeArray.length-1;
-       this.setState({data:newData})
+       this.setState({data:newData,resultCount:this.state.resultCount + newData.ScopeArray.length})
      },
      
          
      deleteScope:function(scope){
-    	 var newData = this.state.data; 
-    	 var deleteArr = [];
-    	 
-    	 searchurl = this.props.url + "/registryEntry?scope=" + scope ;
-    	 
-    	 $.ajax({
-   	      url: searchurl,
-   	      dataType: 'json',
-   	      cache: false,
-   	      success: function(data) {
-   	    	for(i = 0; i< data.list.length; i++){
-   	   	        deleteArr.push(data.list[i].id);
-   	   	     }
-   	    	$.ajax({
-         	      url: this.props.url + "/registryEntry/" + deleteArr.join(),
-         	      type:'DELETE',
-         	      cache: false,
-         	      success: function(data) {
-         	    	 this.getData(this.state.filterData);
-         	      }.bind(this),
-         	      error: function(xhr, status, err) {
-         	    	  alert(status);
-         	    	  alert(err.toString());
-         	        console.error(this.props.url, status, err.toString());
-         	      }.bind(this)
-         	    });
-      	 
-   	      }.bind(this),
-   	      error: function(xhr, status, err) {
-   	        console.error(this.props.url, status, err.toString());
-   	      }.bind(this)
-   	    });
-    	 
+         var newData = this.state.data; 
+         var deleteArr = [];
+         
+         searchurl = this.props.url + "/registryEntry?scope=" + scope ;
+         
+         $.ajax({
+          url: searchurl,
+          dataType: 'json',
+          cache: false,
+          success: function(data) {
+            for(i = 0; i< data.list.length; i++){
+                deleteArr.push(data.list[i].id);
+             }
+            $.ajax({
+                  url: this.props.url + "/registryEntry/" + deleteArr.join(),
+                  type:'DELETE',
+                  cache: false,
+                  success: function(data) {
+                     this.getData(this.state.filterData);
+                  }.bind(this),
+                  error: function(xhr, status, err) {
+                      alert(err.toString() + status);
+                      
+                    console.error(this.props.url, status, err.toString());
+                  }.bind(this)
+                });
+         
+          }.bind(this),
+          error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+          }.bind(this)
+        });
+         
      },
      
      searchEntries:function(searchData){
-         this.getData(searchData); 
+         searchData.offset = this.state.filterData.offset;
+        this.getData(searchData); 
      },
      
      updateEntry:function(entryData){
@@ -234,82 +245,175 @@ var RegistryApplication = React.createClass({
              newData.ScopeAssoc[data.scope] = newData.ScopeArray.length-1;
          }
          newData.ScopeArray[newData.ScopeAssoc[data.scope]].regentries.push(data);
-        this.setState({data: newData});
+        this.setState({data: newData,resultCount:this.state.resultCount+1});
         this.closeModal();
         
          
-      //   this.closeModal();
+      
      },
      
      deleteEntry:function(entryid){
-    	     var data = this.state.data;
-    	     var newdata = this.state.data;
-    	     var found = false;
-    	     for(var i = 0; i<data.ScopeArray.length; i++){
-    	        for(var j = 0; j<data.ScopeArray[i].regentries.length ; j++){
-    	        	if(data.ScopeArray[i].regentries[j].id == entryid) {
-    	        		found = true;
-    	        		var scope = newdata.ScopeArray[i].regentries[j].scope; //scope this entry lives under
-    	        		newdata.ScopeArray[i].regentries.splice(j,1); //remove item from data
-    	        		break;
-    	        	}
-    	           if(found) break;	
-    	        }
-    	    
-    	     }
-    	     
-    	 	 $.ajax({
-       	      url: this.props.url + "/registryEntry/" + entryid,
-       	      type:'DELETE',
-       	      cache: false,
-       	      success: function(data) {
-       	    	//this.getData(this.state.filterData);
-       	    	  this.setState(newdata);
-       	      }.bind(this),
-       	      error: function(xhr, status, err) {
-       	    	  alert(status);
-       	    	  alert(err.toString());
-       	        console.error(this.props.url, status, err.toString());
-       	      }.bind(this)
-       	    });
-    	 
-    	 
+             var data = this.state.data;
+             var newdata = this.state.data;
+             var found = false;
+             for(var i = 0; i<data.ScopeArray.length; i++){
+                for(var j = 0; j<data.ScopeArray[i].regentries.length ; j++){
+                    if(data.ScopeArray[i].regentries[j].id == entryid) {
+                        found = true;
+                        var scope = newdata.ScopeArray[i].regentries[j].scope; //scope this entry lives under
+                        newdata.ScopeArray[i].regentries.splice(j,1); //remove item from data
+                        break;
+                    }
+                   if(found) break; 
+                }
+            
+             }
+             
+             $.ajax({
+              url: this.props.url + "/registryEntry/" + entryid,
+              type:'DELETE',
+              cache: false,
+              success: function(data) {
+                  this.setState(newdata);
+              }.bind(this),
+              error: function(xhr, status, err) {
+                  alert(status);
+                  alert(err.toString());
+                console.error(this.props.url, status, err.toString());
+              }.bind(this)
+            });
+         
+         
      },
      
+     getScopeEntries:function(scope){
+         
+         var newData = this.state.data;
+ 
+        var  searchurl = this.props.url + "/registryEntry?scope=" + scope + "&confidential=*&name=*&value=*&matchCase=false";
+        $.ajax({
+         url: searchurl,
+         dataType: 'json',
+         cache: false,
+         success: function(data) {
+            
+            var resultCount = this.state.resultCount;
+            //newData.ScopeArray[0].regentries = null;
+            for(var i = 0; i< newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.length; i++){
+                newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.splice(0,1);
+                resultCount--;
+            }
+            
+            for(var i = 0; i< data.list.length; i++){
+                newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.push(data.list[i]);
+                resultCount++;
+            }
+            
+            //var newList=[{id:23,name:'test',value:'test',confidential:true,scope:'Scope1'}];
+           // newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.concat(newList);
+            
+             this.setState({data: newData,resultCount:this.state.resultCount+1}); 
+            
+            
+         }.bind(this),
+         error: function(xhr, status, err) {
+             alert(err)
+         }.bind(this)
+       });
+       
+      
+         
+               
+               
+          
+        
+        
+         
+        
+             
+          
+         
+     },
      
- 	render: function() {
- 	    
- 	    return <div>
-    			<a href="#" onClick={this.openCreateForm}><span className="glyphicon glyphicon-plus-sign" title="Add Entry"></span></a> 
-    			<Modal isOpen={this.state.isModalOpen} transitionName="modal-anim">{this.state.ModalData}</Modal> 
-    			<RegistryEntryFilterPanel>
-    			   <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
-    			   {this.state.error}
-    			   <RegistryScopeList url={this.props.url} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data.ScopeArray}/>
-    		</div>
+     newPageHandler:function(newOffset){
+         var filterData = this.state.filterData;
+         filterData.offset = newOffset;
+         this.setState({filterData:filterData,resultCount:this.state.resultCount-1});
+         this.getData(filterData);
+     },
+    render: function() {
+       
+        return <div>
+                <a href="#" onClick={this.openCreateForm}><span className="glyphicon glyphicon-plus-sign" title="Add Entry"></span></a> 
+                <Modal isOpen={this.state.isModalOpen} transitionName="modal-anim">{this.state.ModalData}</Modal> 
+                <RegistryEntryFilterPanel>
+                   <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
+                   <ResultCount data={this.state.resultCount}/>
+                 {this.state.error}
+                   <RegistryScopeList url={this.props.url} getScopeEntries={this.getScopeEntries} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data}/>
+                   <Pagination getNewPage={this.newPageHandler} resultCount={this.state.resultCount} offset={this.state.filterData.offset} numEntriesPerPage={this.state.filterData.count} />
+            </div>
     }
-	
-	
+    
+    
 });
 
+var ResultCount = React.createClass({
+    render: function(){
+        return <div><h4>Entries Found: {this.props.data}</h4></div>
+    }
+});
+
+var PaginationLink = React.createClass({
+    handleNewPage:function(e){
+        e.preventDefault();
+      this.props.onClick(this.props.id)  
+    },
+        
+    render: function(){
+        return(<li className={this.props.className}><a href="#" onClick={this.handleNewPage}>{this.props.id}</a></li>);
+    }
+});
+
+var Pagination = React.createClass({
+   handleNewPage:function(id){
+       var newoffset = this.props.numEntriesPerPage * (id-1);
+       this.props.getNewPage(newoffset);
+   },
+   Pages:[],
+   
+   render:function(){
+       this.Pages = [];
+       
+       var numPages = Math.ceil(this.props.resultCount/this.props.numEntriesPerPage);
+       var curPage = Math.floor(this.props.offset/this.props.numEntriesPerPage) + 1
+       
+       for(i = 1  ; i <= numPages; i++){
+           if(i==curPage) this.Pages.push({id:i,classname:"active"});
+           else this.Pages.push({id:i,classname:""});
+           
+       }
+       
+       var pageLinks = this.Pages.map(function(page,key) {
+           return (<PaginationLink onClick={this.handleNewPage} key={key} id={page.id} className={page.classname} />);
+          },this);
+       
+       return(<ul className="pagination">{pageLinks}</ul>);
+   } 
+});
 
 /* component that displays a categorized list of  Registry scopes*/
 var RegistryScopeList = React.createClass({
-    getInitialState: function() { 
-        return {data:this.props.data}; 
+    
+    handleCopyScope: function(obj, entryData, oldscope){
         
-    }, 
-    
-    
-	handleCopyScope: function(obj, entryData, oldscope){
-	    
-	    this.props.copyScopeHandler(entryData, oldscope)
+        this.props.copyScopeHandler(entryData, oldscope)
     },
     handleDeleteScope: function(obj,scope){
-    	this.props.deleteScopeHandler(scope);
+        this.props.deleteScopeHandler(scope);
     },
     handleDeleteEntry: function(obj,entryId){
-    	this.props.deleteEntryHandler(entryId);
+        this.props.deleteEntryHandler(entryId);
     },
     
     handleUpdateEntry: function(obj,entryData){
@@ -320,38 +424,47 @@ var RegistryScopeList = React.createClass({
        this.props.addEntryHandler(entryData);
     },
     
-	render: function(){
-		return(<div className="panel-group" id="accordion">
-		{this.props.data.map(function(scopes) {
-		      var boundCopyScope = this.handleCopyScope.bind(null,this);	
-		      var boundUpdateEntry = this.handleUpdateEntry.bind(null,this);
-		      var boundDeleteScope = this.handleDeleteScope.bind(null,this.scopes);
-		      var boundDeleteEntry = this.handleDeleteEntry.bind(null,this);
-		      var boundAddEntry = this.handleAddEntry.bind(null,this);
-		      
-		      return (
-		    	 		  <RegistryScope handleDeleteEntry={boundDeleteEntry}
-		    	 		    handleUpdateEntry={boundUpdateEntry}
-		    	 		    handleAddEntry = {boundAddEntry}
-		    	 		    handleDeleteScope={boundDeleteScope} 
-		    	 		    data={scopes.regentries}
-		    	 		    key={scopes.scope}
-		    	 		    url={this.props.url}
-		    	 		    idx={scopes.scope}
-		    	 		    handleCopyScope={boundCopyScope} />
-		    	      );
-		     },this)}
-		</div>
-		
-			
-		);
-	}
+    handleUpdateScope:function(obj,scope){
+       this.props.getScopeEntries(scope);
+    },
+    
+    render: function(){
+        return(<div className="panel-group" id="accordion">
+        {this.props.data.ScopeArray.map(function(scopes,idx) {
+              var boundCopyScope = this.handleCopyScope.bind(null,this);    
+              var boundUpdateEntry = this.handleUpdateEntry.bind(null,this);
+              var boundDeleteScope = this.handleDeleteScope.bind(null,this.scopes);
+              var boundDeleteEntry = this.handleDeleteEntry.bind(null,this);
+              var boundAddEntry = this.handleAddEntry.bind(null,this);
+              var boundUpdateScope = this.handleUpdateScope.bind(null,this);
+              return (
+                          <RegistryScope handleDeleteEntry={boundDeleteEntry}
+                            handleUpdateEntry={boundUpdateEntry}
+                            handleAddEntry = {boundAddEntry}
+                            handleDeleteScope={boundDeleteScope}
+                            updateScope={boundUpdateScope}
+                            data={scopes.regentries}
+                            key={idx}
+                            url={this.props.url}
+                            idx={"scope" +idx}
+                            scope={scopes.scope}
+                            handleCopyScope={boundCopyScope}
+                            />
+                      );
+             },this)}
+        </div>
+        
+            
+        );
+    }
 });
 
 var RegistryScope = React.createClass({
     getInitialState: function() { 
         return { isModalOpen: false,
-               ModalData:null
+               ModalData:null,
+               showAllLink:'',
+               data:this.props.data
          }; 
         
     }, 
@@ -365,7 +478,7 @@ var RegistryScope = React.createClass({
 
     openCreateEntry: function(e){
         e.preventDefault();
-        var data={scope:this.props.idx,name:'',value:'',confidential:false};
+        var data={scope:this.props.scope,name:'',value:'',confidential:false};
        this.setState({ isModalOpen: true,
        ModalData:<div><h3>CreateEntry</h3> 
               <RegistryEntryForm onSubmit={this.createEntryHandler} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div>
@@ -388,7 +501,7 @@ var RegistryScope = React.createClass({
     
     onHandleDeleteScope:function(){
         this.closeModal();
-        this.props.handleDeleteScope(this.props.idx)
+        this.props.handleDeleteScope(this.props.scope)
     },
     
     onHandleDeleteEntry:function(entryId){
@@ -412,27 +525,56 @@ var RegistryScope = React.createClass({
     openCopyScope: function(e){
        e.preventDefault();
        this.setState({ isModalOpen: true,
-       ModalData:<div><h3>Copy Scope</h3><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.idx} onSubmit={this.onHandleCopyScopeSubmit}/></div>   
+       ModalData:<div><h3>Copy Scope</h3><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.scope} onSubmit={this.onHandleCopyScopeSubmit}/></div>   
               
        });
        
     },
     
+    onShowAllClick:function(e){
+        e.preventDefault(); 
+        this.props.updateScope(this.props.scope);
+        this.setState({showAllLink:''});
+    },
+    setShowAllLink:function(e){
+        e.preventDefault()
+        var  searchurl = this.props.url + "/registryEntry?scope=" + $(e.target).text() + "&confidential=*&name=*&value=*&matchCase=false";
+        $.ajax({
+         url: searchurl,
+         dataType: 'json',
+         cache: false,
+         success: function(data) {
+             
+         if(this.state.data.length < data.totalCount)
+                 {
+                  this.setState({showAllLink:<a href="#" className="pull-right" onClick={this.onShowAllClick}>Show All</a>});
+                 }
+            
+             
+         }.bind(this),
+         error: function(xhr, status, err) {
+             alert(err)
+         }.bind(this)
+       });
+       
+    },
+    
+    
     
    render: function(){
        
-      
-       var id = this.props.idx.replace(/\//g,'_'); //id will be used in bootstrap panels, so that each panel has a unique id.
+       var id = this.props.idx.replace(/[\/\s]/g,'_'); //id will be used in bootstrap panels, so that each panel has a unique id.
        var datatarget= "#" + id;
        
        
-       return (<div className="panel panel-primary">
+       
+       return (<div className="panel panel-primary" >
         <Modal isOpen={this.state.isModalOpen} transitionName="modal-anim"> 
              {this.state.ModalData} 
        </Modal> 
        <div className="panel-heading">
        <h4 className="panel-title">
-         <span style={collapsePanelLink} data-toggle="collapse" data-parent="#accordion" data-target={datatarget}>{this.props.idx}</span>
+         <span style={collapsePanelLink} data-toggle="collapse" data-parent="#accordion" data-target={datatarget} onClick={this.setShowAllLink}>{this.props.scope}</span>
          <span className="panel-title pull-right">
              <a href="#" onClick={this.openCopyScope}>
                  <span title="Copy Scope" className="glyphicon glyphicon-share"></span>
@@ -448,7 +590,9 @@ var RegistryScope = React.createClass({
        <a href="#" onClick={this.openCreateEntry}>
            <span title="Create Entry in this scope" className="glyphicon glyphicon-plus"></span>
        </a> 
-       <RegistryEntryList id={id} deleteEntryHandler={this.onHandleDeleteEntry} url={this.props.url} updateEntryHandler={this.onHandleUpdateEntry} data={this.props.data}/>
+       {this.state.showAllLink}
+       <RegistryEntryList id={id} deleteEntryHandler={this.onHandleDeleteEntry} url={this.props.url} updateEntryHandler={this.onHandleUpdateEntry} data={this.state.data}/>
+       
        </div>
        </div></div>);
      
@@ -463,9 +607,11 @@ var RegistryEntryList = React.createClass({
     getInitialState: function() { 
         return { data:[]}; 
         
-    },     
+    },   
     
-    componentDidMount:function(){
+    
+    
+    componentDidMount:function(nextprops){
         this.setState({data:this.props.data});  
      },
 
@@ -477,7 +623,7 @@ var RegistryEntryList = React.createClass({
     },
     render: function(){
          var parent="accordion" + this.props.id;    
-    
+      
         var items = this.state.data.map(function(entry) {
               var boundDeleteEntry = this.handleDeleteEntry.bind(null,this.entry);
               var boundUpdateEntry = this.handleUpdateEntry.bind(null,this.entry)
@@ -488,7 +634,7 @@ var RegistryEntryList = React.createClass({
         return(
         
         
-        <div className="panel-group" id="accordion">
+        <div className="panel-group" id={parent}>
         {items}
         </div>
         
@@ -587,15 +733,15 @@ var RegistryEntry = React.createClass({
  */
 var CopyScopeForm = React.createClass({
 
-	getInitialState: function(){
-		return{scope:''};
-	},
+    getInitialState: function(){
+        return{scope:''};
+    },
    handleCancel: function(){
       this.props.onCancel();
    },
    
    handleScopeChange: function(e){
-   	 this.setState({scope: e.target.value});
+     this.setState({scope: e.target.value});
    },
    
    handleSubmit: function(e){
@@ -671,31 +817,31 @@ var CopyScopeForm = React.createClass({
  * This form is used for create/edit of a registry entry.
  */
 var RegistryEntryForm = React.createClass({
-	getInitialState: function(){
-	    return {name:'',value:'',scope:'',confidential:'', id:0};
-	},
-	
-	componentDidMount: function(){
-	    
-		 this.setState({id:this.props.data.id,
-		     name:this.props.data.name,
-		     scope:this.props.data.scope,
-		     confidential:this.props.data.confidential,
-		     value:this.props.data.value});
-	},
-	
-	onSubmitClicked:function(e){
-	    e.preventDefault();
-		var name=this.state.name;
-		var scope=this.state.scope;
-		var confidential= this.state.confidential!=null?this.state.confidential:false;
-		var value = this.state.value
-		var id = typeof(this.props.data.id) != 'undefined'?this.props.data.id:0;
-		var entryData = {id:id, name:name,value:value,scope:scope,confidential:confidential};
-		
-		var murl = this.props.url + "/registryEntry";
-		 var murl = id===0?murl:murl + "/" + id;
-	     $.ajax({
+    getInitialState: function(){
+        return {name:'',value:'',scope:'',confidential:'', id:0,};
+    },
+    
+    componentDidMount: function(){
+        
+         this.setState({id:this.props.data.id,
+             name:this.props.data.name,
+             scope:this.props.data.scope,
+             confidential:this.props.data.confidential,
+             value:this.props.data.value});
+    },
+    
+    onSubmitClicked:function(e){
+        e.preventDefault();
+        var name=this.state.name;
+        var scope=this.state.scope;
+        var confidential= this.state.confidential!=null?this.state.confidential:false;
+        var value = this.state.value
+        var id = typeof(this.props.data.id) != 'undefined'?this.props.data.id:0;
+        var entryData = {id:id, name:name,value:value,scope:scope,confidential:confidential};
+        
+        var murl = this.props.url + "/registryEntry";
+         var murl = id===0?murl:murl + "/" + id;
+         $.ajax({
              url: murl,
              dataType: 'json',
              type:this.props.type,
@@ -707,55 +853,56 @@ var RegistryEntryForm = React.createClass({
                  this.props.onSubmit(data);
              }.bind(this),
              error: function(xhr, status, err) {
+                 this.setState(err)
                  alert(status);
                  console.error(murl, status, err.toString());
              }.bind(this)
            });
-		
-		
-		
-	},
-	
-	
-	onNameChange:function(e){
-		this.setState({name: e.target.value});
-	},
-	
-	onScopeChange:function(e){
-	   this.setState({scope: e.target.value});
-	},
-	
-	onValueChange:function(e){
-	   this.setState({value: e.target.value});
-	},
-	
-	onConfidentialChange:function(e){
-	   this.setState({confidential: e.target.checked});
-	},
-	
-	
-	
-	render:function(){
-		return (<form>
-		  <div class="form-group">
-		    <label for="scope">Scope</label>
-		    <input type="text" className="form-control" onChange={this.onScopeChange} id="scope" value={this.state.scope} />
-		  </div>
-		  <div class="form-group">
-		    <label for="name">Name:</label>
-		    <input type="text" onChange={this.onNameChange} className="form-control" id="name" value={this.state.name} />
-		  </div>
+        
+        
+        
+    },
+    
+    
+    onNameChange:function(e){
+        this.setState({name: e.target.value});
+    },
+    
+    onScopeChange:function(e){
+       this.setState({scope: e.target.value});
+    },
+    
+    onValueChange:function(e){
+       this.setState({value: e.target.value});
+    },
+    
+    onConfidentialChange:function(e){
+       this.setState({confidential: e.target.checked});
+    },
+    
+    
+    
+    render:function(){
+        return (<form>
+         <div class="form-group">
+            <label for="scope">Scope</label>
+            <input type="text" className="form-control" onChange={this.onScopeChange} id="scope" value={this.state.scope} />
+          </div>
           <div class="form-group">
-			<label for="value">Value:</label>
-			<input type="text" onChange={this.onValueChange} className="form-control" id="value" value={this.state.value} />
-     	  </div>
-		  <hr />
-		  <div className="form-group">
-		   <div className="checkbox">
-		    <label><input type="checkbox" id="confidential" onChange={this.onConfidentialChange} checked={this.state.confidential}  /> Is Confidential</label>
-		  </div>
-		            
-		  
+            <label for="name">Name:</label>
+            <input type="text" onChange={this.onNameChange} className="form-control" id="name" value={this.state.name} />
+          </div>
+          <div class="form-group">
+            <label for="value">Value:</label>
+            <input type="text" onChange={this.onValueChange} className="form-control" id="value" value={this.state.value} />
+          </div>
+          <hr />
+          <div className="form-group">
+           <div className="checkbox">
+            <label><input type="checkbox" id="confidential" onChange={this.onConfidentialChange} checked={this.state.confidential}  /> Is Confidential</label>
+          </div>
+                    
+          
           </div>
           
           <div className="form-group row">
@@ -766,8 +913,8 @@ var RegistryEntryForm = React.createClass({
           </div>
           </form>);
           
-		  
-	}
+          
+    }
 });
 
 
@@ -775,86 +922,102 @@ var RegistryEntryForm = React.createClass({
  * Filter Form is used to do queries against data to filter results
  */
 var FilterForm = React.createClass({
-	getInitialState: function(){
-		return {name:'*',value:'*',scope:'*',confidential:'*',inheritance:false,sensitive:false};
-	},
-	onSubmitClicked:function(e){
-		e.preventDefault();
-		var name=this.state.name;
-		var scope=this.state.scope;
-		var confidential= this.state.confidential;
-		var inheritance = this.state.inheritance;
-		var sensitive = this.state.sensitive;
-		var value = this.state.value;
-		
-		
-		this.props.onSubmit({name:name,value:value,scope:scope,confidential:confidential,inheritance:false,sensitive:false});
-	},
-	
-	
-	onNameChange:function(e){
-		this.setState({name: e.target.value});
-	},
-	
-	onScopeChange:function(e){
-		this.setState({scope: e.target.value});
-	},
-	
-	onValueChange:function(e){
-		this.setState({value: e.target.value});
-	},
-	
-	onConfidentialChange:function(e){
-		this.setState({confidential: e.target.checked});
-	},
-	
-	onSensitiveChange:function(e){
-		this.setState({sensitive: e.target.checked});
-	},
-	
-	onInheritanceChange:function(e){
-		this.setState({inheritance: e.target.checked});
-	},
-	
-	render:function(){
-		return (<form>
-		  <h3>Filter Registry Entries</h3>
-		  <div class="form-group">
-		    <label for="scope">Scope</label>
-		    <input type="text" className="form-control" onChange={this.onScopeChange} id="scope" />
-		  </div>
-		  <div class="form-group">
-		    <label for="name">Name:</label>
-		    <input type="text" onChange={this.onNameChange} className="form-control" id="name" />
-		  </div>
+    getInitialState: function(){
+        return {name:'*',value:'*',scope:'*',confidential:'*',inheritance:false,sensitive:false,count:100,valid:true};
+    },
+    
+    componentDidMount:function(){
+      this.setState({count:this.props.data.count});  
+    },
+    onSubmitClicked:function(e){
+        e.preventDefault();
+        var name=this.state.name;
+        var scope=this.state.scope;
+        var confidential= this.state.confidential;
+        var inheritance = this.state.inheritance;
+        var sensitive = this.state.sensitive;
+        var value = this.state.value;
+        var count = this.state.count;
+        
+        this.props.onSubmit({name:name,value:value,scope:scope,confidential:confidential,inheritance:false,sensitive:false,count:count });
+    },
+    
+    
+    onNameChange:function(e){
+        var valid=true
+        this.setState({name: e.target.value,valid:valid});
+    },
+    
+    onScopeChange:function(e){
+        this.setState({scope: e.target.value});
+    },
+    
+    onValueChange:function(e){
+        this.setState({value: e.target.value});
+    },
+    
+    onConfidentialChange:function(e){
+        this.setState({confidential: e.target.checked});
+    },
+    
+    onSensitiveChange:function(e){
+        this.setState({sensitive: e.target.checked});
+    },
+    
+    onInheritanceChange:function(e){
+        this.setState({inheritance: e.target.checked});
+    },
+    
+    onCountChange:function(e){
+        this.setState({count:e.target.value});
+    },
+    
+    render:function(){
+        return (<form>
+        <ErrorMessage>{this.state.errormessage}</ErrorMessage>
+          <h3>Filter Registry Entries</h3>
           <div class="form-group">
-			<label for="value">Value:</label>
-			<input type="text" onChange={this.onValueChange} className="form-control" id="value" />
-     	  </div>
-		  <hr />
-		  <div className="form-group">
-		   <div className="checkbox">
-		    <label><input type="checkbox" id="confidential" onChange={this.onConfidentialChange}  /> Is Confidential</label>
-		  </div>
-		            
-		  <div className="checkbox">
-		    <label><input type="checkbox" id="inheritance" onChange={this.onInheritanceChange} /> Use inheritance</label>
-    	  </div>
-    	  
-    	  <div className="checkbox">
-		    <label><input type = "checkbox" id = "sensitive" onChange={this.onSensitiveChange} /> Case Sensitive</label>
+            <label for="scope">Scope</label>
+            <input type="text" placeholder="Scope" className="form-control" value={this.state.scope} onChange={this.onScopeChange} id="scope" required />
+          </div>
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" placeholder="Name" onChange={this.onNameChange} value={this.state.name} className="form-control" id="name" />
+          </div>
+          <div class="form-group">
+            <label for="value">Value:</label>
+            <input type="text" placeholder="Value" onChange={this.onValueChange} value={this.state.value} className="form-control" id="value" />
+          </div>
+            
+          <div class="form-group">
+            <label for="name">Max Results Per Page:</label>
+            <input type="number" value={this.state.count} onChange={this.onCountChange} className="form-control" max="500" min="0" id="name" />
+          </div>
+            
+          <hr />
+          <div className="form-group">
+           <div className="checkbox">
+            <label><input type="checkbox" id="confidential" onChange={this.onConfidentialChange} checked={this.state.confidential}  /> Is Confidential</label>
+          </div>
+                    
+          <div className="checkbox">
+            <label><input type="checkbox" id="inheritance" onChange={this.onInheritanceChange} checked={this.state.inheritance} /> Use inheritance</label>
+          </div>
+          
+          <div className="checkbox">
+            <label><input type = "checkbox" id = "sensitive" onChange={this.onSensitiveChange} checked={this.state.sensitive} /> Case Sensitive</label>
           </div>
           </div>
           
           <div className="form-group row">
             <div className="offset-sm-2 col-sm-10">
-              <button type="button" className="btn btn-primary pull-right" onClick={this.onSubmitClicked} >Submit</button>
+              <button type="submit" className="btn btn-primary pull-right" enabled={this.state.valid} onClick={this.onSubmitClicked} >Submit</button>
             </div>
           </div>
           </form>);
           
-		  
-	}
+          
+    }
 });
 
 
@@ -862,15 +1025,15 @@ var FilterForm = React.createClass({
  * this dialogue is to confirm deleting entries etc.
  */
 var ConfirmationForm = React.createClass({
-	render:function(){
-		return (
-		<div>
-		  {this.props.children}
-		  <button type="button" onClick={this.props.onSubmit} className="btn btn-primary pull-right">Submit</button>
-		  <button type="button" onClick={this.props.onCancel} className="btn btn-primary pull-right">Cancel</button>
-		</div>
-		);
-	}
+    render:function(){
+        return (
+        <div>
+          {this.props.children}
+          <button type="button" onClick={this.props.onSubmit} className="btn btn-primary pull-right">Submit</button>
+          <button type="button" onClick={this.props.onCancel} className="btn btn-primary pull-right">Cancel</button>
+        </div>
+        );
+    }
 });
 
 
@@ -888,17 +1051,34 @@ var ConfirmationForm = React.createClass({
  * this is the readonly view of a registry entry
  */
 var RegistryEntryRead = React.createClass({
+    
   render: function() {
+      
+      
     return  <div id={this.props.id} className="panel-collapse collapse">
-    			<div className="panel-body">
-    				Name: blah<br />
-    				entryid: {this.props.data.id}<br />
-    				Confidential
-    				<h1>Registry Entry (Read Only)</h1>
-       			</div>
-       		</div>
+                <div className="panel-body">
+                    <RegistryEntryDispForm data={this.props.data} />
+                </div>
+            </div>
   
 
+  }
+});
+
+/*
+ * this is the display view of a registry entry
+ */
+var RegistryEntryDispForm= React.createClass({
+    
+  render: function() {
+    var confidential= this.props.data.confidential?"checked":"";  
+    return  <div>
+    Name: {this.props.data.name}<br />
+    Value: {this.props.data.value}<br />
+    entryid: {this.props.data.id}<br />
+    Confidential <input type="checkbox" checked={confidential} disabled="disabled"/>
+    <h1>Registry Entry (Read Only)</h1>
+</div>
   }
 });
 
@@ -908,25 +1088,25 @@ var RegistryEntryRead = React.createClass({
  * it is a collapsable panel that opens up using a button in the top left
  */
 var RegistryEntryFilterPanel = React.createClass({
-	render: function(){
-		return <div><nav id="myNavmenu" style={filterPanelStyle} className="navmenu navmenu-default navmenu-fixed-left offcanvas" role="navigation">
-		 
-		 {this.props.children}
-		
-		</nav>
-		<div className="navbar navbar-default navbar-fixed-top">
-		<button type="button" className="navbar-toggle" data-toggle="offcanvas" data-target="#myNavmenu" data-canvas="body">
-		<span className="icon-bar"></span>
-		<span className="icon-bar"></span>
-		<span className="icon-bar"></span>
-		</button>
-		</div>
-		
-		
-		
-		
-		</div>
-	}
+    render: function(){
+        return <div><nav id="myNavmenu" style={filterPanelStyle} className="navmenu navmenu-default navmenu-fixed-left offcanvas" role="navigation">
+         
+         {this.props.children}
+        
+        </nav>
+        <div className="navbar navbar-default navbar-fixed-top">
+        <button type="button" className="navbar-toggle" data-toggle="offcanvas" data-target="#myNavmenu" data-canvas="body">
+        <span className="icon-bar"></span>
+        <span className="icon-bar"></span>
+        <span className="icon-bar"></span>
+        </button>
+        </div>
+        
+        
+        
+        
+        </div>
+    }
 });
 
 
