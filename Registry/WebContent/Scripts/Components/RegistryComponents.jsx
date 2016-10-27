@@ -1072,13 +1072,28 @@ var RegistryEntryDispForm= React.createClass({
     
   render: function() {
     var confidential= this.props.data.confidential?"checked":"";  
-    return  <div>
-    Name: {this.props.data.name}<br />
-    Value: {this.props.data.value}<br />
-    entryid: {this.props.data.id}<br />
-    Confidential <input type="checkbox" checked={confidential} disabled="disabled"/>
-    <h1>Registry Entry (Read Only)</h1>
+    return <div class="form-horizontal">
+    <div class="form-group">
+    <label class="control-label col-sm-2">ID:</label>&nbsp;{this.props.data.id}
+     </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2">Name:</label>{this.props.data.name}
+    
+  </div>
+  
+  <div class="form-group">
+  <label class="control-label col-sm-2">Value:</label> {this.props.data.value}
+  
 </div>
+
+<div class="form-group">
+<label class="control-label col-sm-2">Confidential:</label>&nbsp;<input type="checkbox" checked={confidential} disabled="disabled"/>
+</div>
+</div>
+
+    
+   
+
   }
 });
 
