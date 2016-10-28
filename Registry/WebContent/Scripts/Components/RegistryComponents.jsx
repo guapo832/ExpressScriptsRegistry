@@ -285,8 +285,7 @@ var RegistryApplication = React.createClass({
      getScopeEntries:function(scope){
          
          var newData = this.state.data;
-        alert(scope)
-        var  searchurl = this.props.url + "/registryEntry?scope=" + scope + "&confidential=*&name=*&value=*&matchCase=false";
+         var  searchurl = this.props.url + "/registryEntry?scope=" + scope + "&confidential=*&name=*&value=*&matchCase=false";
         $.ajax({
          url: searchurl,
          dataType: 'json',
@@ -294,7 +293,7 @@ var RegistryApplication = React.createClass({
          success: function(data) {
             
             var resultCount = this.state.resultCount;
-            //newData.ScopeArray[0].regentries = null;
+            
             for(var i = 0; i< newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.length; i++){
                 newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.splice(0,1);
                 resultCount--;
@@ -305,10 +304,7 @@ var RegistryApplication = React.createClass({
                 resultCount++;
             }
             
-            //var newList=[{id:23,name:'test',value:'test',confidential:true,scope:'Scope1'}];
-           // newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.concat(newList);
-            
-             this.setState({data: newData,resultCount:this.state.resultCount+1}); 
+            this.setState({data: newData,resultCount:this.state.resultCount+1}); 
             
             
          }.bind(this),
@@ -730,14 +726,30 @@ var RegistryEntry = React.createClass({
 var CopyScopeForm = React.createClass({
 
     getInitialState: function(){
-        return{scope:''};
+        return{scope:'',errormessage:''};
     },
    handleCancel: function(){
       this.props.onCancel();
    },
    
    handleScopeChange: function(e){
-     this.setState({scope: e.target.value});
+       
+     this.setState({scope: e.target.value,errormessage:''},function(){
+         if(this.state.scope !=''){
+             var  searchurl = this.props.url + "/registryEntry?scope=" + this.state.scope + "&confidential=*&name=*&value=*&matchCase=false";
+             $.ajax({
+                 url: searchurl,
+                 dataType: 'json',
+                 cache: false,
+                 success: function(data) {
+                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A Scope with this name already exists</ErrorMessage>})
+                 }.bind(this),
+                 error: function(xhr, status, err) {
+                     this.setState({errormessage:status + err.toString()});
+                 }.bind(this)
+             });
+         }
+     });
    },
    
    handleSubmit: function(e){
@@ -781,6 +793,7 @@ var CopyScopeForm = React.createClass({
             });
           }.bind(this),
           error: function(xhr, status, err) {
+              this.setState({errormessage:<ErrorMessage>{status + " " + err.toString()}</ErrorMessage>});
             console.error(this.props.url, status, err.toString());
           }.bind(this)
         });
@@ -792,6 +805,7 @@ var CopyScopeForm = React.createClass({
    },
    render: function(){
       return (<form>
+      <span>{this.state.errormessage}</span>
     <div className="form-group row">
       <label for="txtScope" className="col-sm-2 col-form-label">Scope</label>
       <div className="col-sm-10">
