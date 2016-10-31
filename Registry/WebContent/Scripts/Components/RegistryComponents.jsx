@@ -24,12 +24,12 @@ var modalStyle = {
         }
 
         var containerStyle = {
-          width: '600px',
+          width: '45%',
           height:'auto',
           position: 'relative',
           margin: '10% auto',
           padding: '0px 0px 0px 0px',
-          background: '#fff'
+          
         }
 
       
