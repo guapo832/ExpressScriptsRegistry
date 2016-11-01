@@ -24,29 +24,15 @@ var modalStyle = {
         }
 
         var containerStyle = {
-          width: '600px',
+          width: '45%',
           height:'auto',
           position: 'relative',
           margin: '10% auto',
-          padding: '5px 20px 13px 20px',
-          background: '#fff'
+          padding: '0px 0px 0px 0px',
+          
         }
 
-        var closeStyle = {
-          background: '#606061',
-          color: '#FFFFFF',
-          lineHeight: '25px',
-          position: 'absolute',
-          right: '-12px',
-          textAlign: 'center',
-          top: '-10px',
-          width: '24px',
-          textDecoration: 'none',
-          fontWeight: 'bold',
-          borderRadius: '12px',
-          boxShadow: '1px 1px 3px #000',
-          cursor: 'pointer'
-        }
+      
 
 
 
@@ -72,6 +58,11 @@ function convertData(indata){
 }
 /* end styles used in react */
 
+var WorkingDialog=React.createClass({
+   render:function(){
+       return <div className="panel panel-default"><div className="panel panel-heading"><i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only"></span></div><div className="panel panel-body"> Working...</div></div>
+   } 
+});
 
 /*Modal is used to do popup forms and dialogs */
 var Modal = React.createClass({
@@ -130,11 +121,12 @@ var RegistryApplication = React.createClass({
      
      //get data retrieves registry entries from server
      getData:function(filterData){
-         this.setState({ isModalOpen: true,
-             ModalData:<div ><i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only"></span> Working...</div>
+        /* this.setState({ isModalOpen: true,
+             ModalData:<WorkingDialog/>
            });
+         */
          
-         searchurl = this.props.url + "/registryEntry?scope=" + filterData.scope + "&confidential=" + filterData.confidential + "&name=" + filterData.name + "&value=" + filterData.value + "&useInheritance=" + filterData.inheritance + "&matchCase=" + filterData.sensitive + "&offset=" + filterData.offset + "&count=" + filterData.count;
+         searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(filterData.scope) + "&confidential=" + filterData.confidential + "&name=" + encodeURIComponent(filterData.name) + "&value=" + encodeURIComponent(filterData.value) + "&useInheritance=" + filterData.inheritance + "&matchCase=" + filterData.sensitive + "&offset=" + filterData.offset + "&count=" + filterData.count;
          $.ajax({
           url: searchurl,
           dataType: 'json',
@@ -162,8 +154,13 @@ var RegistryApplication = React.createClass({
           e.preventDefault();
           data = {scope:'',name:'',value:'',confidential:''};
           this.setState({ isModalOpen: true,
-          ModalData:<div><h3>Create Registry Entry</h3> 
-          <RegistryEntryForm onSubmit={this.addEntry} type="POST" url={this.props.url} onCancel={this.closeModal} data={data} /></div>
+          ModalData:<div className="panel panel-default">
+              <div className="panel panel-heading"><h3>Create Entry</h3></div>
+              <div className="panel panel-body"><RegistryEntryForm onSubmit={this.addEntry} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div>
+              <div className="panel panel-footer">&nbsp;</div>
+          </div>
+              
+             
         });
           
      },
@@ -187,7 +184,7 @@ var RegistryApplication = React.createClass({
          var newData = this.state.data; 
          var deleteArr = [];
          
-         searchurl = this.props.url + "/registryEntry?scope=" + scope ;
+         searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(scope) ;
          
          $.ajax({
           url: searchurl,
@@ -234,7 +231,7 @@ var RegistryApplication = React.createClass({
                  break;
             }
         }
-        this.setState({data: newData});
+        this.setState({data: newData,error:''});
          this.closeModal();
      },
      
@@ -245,7 +242,7 @@ var RegistryApplication = React.createClass({
              newData.ScopeAssoc[data.scope] = newData.ScopeArray.length-1;
          }
          newData.ScopeArray[newData.ScopeAssoc[data.scope]].regentries.push(data);
-        this.setState({data: newData,resultCount:this.state.resultCount+1});
+        this.setState({data: newData,resultCount:this.state.resultCount+1,error:''});
         this.closeModal();
         
          
@@ -289,8 +286,7 @@ var RegistryApplication = React.createClass({
      getScopeEntries:function(scope){
          
          var newData = this.state.data;
- 
-        var  searchurl = this.props.url + "/registryEntry?scope=" + scope + "&confidential=*&name=*&value=*&matchCase=false";
+         var  searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(scope) + "&confidential=*&name=*&value=*&matchCase=false";
         $.ajax({
          url: searchurl,
          dataType: 'json',
@@ -298,7 +294,7 @@ var RegistryApplication = React.createClass({
          success: function(data) {
             
             var resultCount = this.state.resultCount;
-            //newData.ScopeArray[0].regentries = null;
+            
             for(var i = 0; i< newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.length; i++){
                 newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.splice(0,1);
                 resultCount--;
@@ -309,10 +305,7 @@ var RegistryApplication = React.createClass({
                 resultCount++;
             }
             
-            //var newList=[{id:23,name:'test',value:'test',confidential:true,scope:'Scope1'}];
-           // newData.ScopeArray[newData.ScopeAssoc[scope]].regentries.concat(newList);
-            
-             this.setState({data: newData,resultCount:this.state.resultCount+1}); 
+            this.setState({data: newData,resultCount:this.state.resultCount+1}); 
             
             
          }.bind(this),
@@ -320,19 +313,6 @@ var RegistryApplication = React.createClass({
              alert(err)
          }.bind(this)
        });
-       
-      
-         
-               
-               
-          
-        
-        
-         
-        
-             
-          
-         
      },
      
      newPageHandler:function(newOffset){
@@ -345,7 +325,7 @@ var RegistryApplication = React.createClass({
        
         return <div>
                 <a href="#" onClick={this.openCreateForm}><span className="glyphicon glyphicon-plus-sign" title="Add Entry"></span></a> 
-                <Modal isOpen={this.state.isModalOpen} transitionName="modal-anim">{this.state.ModalData}</Modal> 
+                <Modal isOpen={this.state.isModalOpen}>{this.state.ModalData}</Modal> 
                 <RegistryEntryFilterPanel>
                    <FilterForm data={this.state.filterData} onSubmit={this.searchEntries}/></RegistryEntryFilterPanel >
                    <ResultCount data={this.state.resultCount}/>
@@ -357,6 +337,8 @@ var RegistryApplication = React.createClass({
     
     
 });
+
+
 
 var ResultCount = React.createClass({
     render: function(){
@@ -480,8 +462,8 @@ var RegistryScope = React.createClass({
         e.preventDefault();
         var data={scope:this.props.scope,name:'',value:'',confidential:false};
        this.setState({ isModalOpen: true,
-       ModalData:<div><h3>CreateEntry</h3> 
-              <RegistryEntryForm onSubmit={this.createEntryHandler} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div>
+       ModalData:<div className="panel panel-default"><div className="panel panel-heading"><h3>CreateEntry</h3> </div>
+              <div className="panel panel-body"><RegistryEntryForm onSubmit={this.createEntryHandler} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div><div className="panel panel-footer"></div></div>
        });
        
     },
@@ -514,18 +496,26 @@ var RegistryScope = React.createClass({
     
     confirmDeleteScope:function(e){
         e.preventDefault();
+        
+        
         this.setState({ isModalOpen: true,
-           ModalData:<div><ConfirmationForm onCancel={this.closeModal} onSubmit={this.onHandleDeleteScope}>
-          <h3>Confirm Delete Scope</h3>
+           ModalData:<div><ConfirmationForm onCancel={this.closeModal} onSubmit={this.onHandleDeleteScope} header={<h3>Confirm Delete Scope</h3>}>
+          
           <p>Are you sure you want to delete this scope {this.props.idx}</p>
+         
            </ConfirmationForm></div>});
     
     },
     
     openCopyScope: function(e){
        e.preventDefault();
+       
        this.setState({ isModalOpen: true,
-       ModalData:<div><h3>Copy Scope</h3><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.scope} onSubmit={this.onHandleCopyScopeSubmit}/></div>   
+       ModalData:<div className="panel panel-default">
+          <div className="panel panel-heading"><h3>Copy Scope</h3></div>
+          <div className="panel panel-body"><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.scope} onSubmit={this.onHandleCopyScopeSubmit}/></div>
+          <div className="panel panel-footer"></div>
+          </div>  
               
        });
        
@@ -537,8 +527,9 @@ var RegistryScope = React.createClass({
         this.setState({showAllLink:''});
     },
     setShowAllLink:function(e){
-        e.preventDefault()
-        var  searchurl = this.props.url + "/registryEntry?scope=" + $(e.target).text() + "&confidential=*&name=*&value=*&matchCase=false";
+        e.preventDefault();
+        var  searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent($(e.target).text()) + "&confidential=*&name=*&value=*&matchCase=false";
+       
         $.ajax({
          url: searchurl,
          dataType: 'json',
@@ -676,8 +667,8 @@ var RegistryEntry = React.createClass({
      confirmDeleteEntry:function(e){
          e.preventDefault();
          this.setState({ isModalOpen: true,
-            ModalData:<div><ConfirmationForm onCancel={this.closeModal} onSubmit={this.onHandleDeleteEntry}>
-           <h3>Confirm Delete Entry</h3>
+            ModalData:<div><ConfirmationForm onCancel={this.closeModal} onSubmit={this.onHandleDeleteEntry} header={<h3>Confirm Delete Entry</h3>}>
+                
           <p>Are you sure you want to delete this Entry {this.props.data.name}</p>
             </ConfirmationForm></div>});
      
@@ -693,8 +684,9 @@ var RegistryEntry = React.createClass({
     openEditEntry: function(e){
         e.preventDefault();
         this.setState({ isModalOpen: true,
-        ModalData:<div><h3>Edit Registry Entry</h3> 
-        <RegistryEntryForm onSubmit={this.updateEntryHandler} type="PUT" url={this.props.url} onCancel={this.closeModal} data={this.state.data}/></div>
+        ModalData:<div className="panel panel-default"><div className="panel panel-heading"><h3>Edit Registry Entry</h3></div>
+        <div className="panel panel-body"><RegistryEntryForm onSubmit={this.updateEntryHandler} type="PUT" url={this.props.url} onCancel={this.closeModal} data={this.state.data}/></div>
+        <div className="panel panel-footer"></div></div>
         });
         
      },
@@ -734,14 +726,30 @@ var RegistryEntry = React.createClass({
 var CopyScopeForm = React.createClass({
 
     getInitialState: function(){
-        return{scope:''};
+        return{scope:'',errormessage:'',disabledSubmit:true};
     },
    handleCancel: function(){
       this.props.onCancel();
    },
    
    handleScopeChange: function(e){
-     this.setState({scope: e.target.value});
+       
+     this.setState({scope: e.target.value,errormessage:'',disabledSubmit:false},function(){
+         if(this.state.scope !=''){
+             var  searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(this.state.scope) + "&confidential=*&name=*&value=*&matchCase=false";
+             $.ajax({
+                 url: searchurl,
+                 dataType: 'json',
+                 cache: false,
+                 success: function(data) {
+                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A Scope with this name already exists</ErrorMessage>,disabledSubmit:true})
+                 }.bind(this),
+                 error: function(xhr, status, err) {
+                     this.setState({errormessage:status + err.toString()});
+                 }.bind(this)
+             });
+         }
+     });
    },
    
    handleSubmit: function(e){
@@ -762,7 +770,7 @@ var CopyScopeForm = React.createClass({
               var entriestocopy = scopeData.ScopeArray[scopeData.ScopeAssoc[this.props.scope]].regentries;
              
              for(i=0;i<entriestocopy.length;i++){
-                destScope.regentries.push({scope:scope, name:entriestocopy[i].name,id:0});
+                destScope.regentries.push({scope:scope, name:entriestocopy[i].name,id:0,value:entriestocopy[i].value});
             }
             var newList = {list:destScope.regentries,totalCount:destScope.regentries.length}
           
@@ -785,6 +793,7 @@ var CopyScopeForm = React.createClass({
             });
           }.bind(this),
           error: function(xhr, status, err) {
+              this.setState({errormessage:<ErrorMessage>{status + " " + err.toString()}</ErrorMessage>});
             console.error(this.props.url, status, err.toString());
           }.bind(this)
         });
@@ -796,6 +805,7 @@ var CopyScopeForm = React.createClass({
    },
    render: function(){
       return (<form>
+      
     <div className="form-group row">
       <label for="txtScope" className="col-sm-2 col-form-label">Scope</label>
       <div className="col-sm-10">
@@ -805,10 +815,11 @@ var CopyScopeForm = React.createClass({
           
     <div className="form-group row">
       <div className="offset-sm-2 col-sm-10">
-        <button type="submit" className="btn btn-primary" onClick={this.handleSubmit}>Submit</button>
+        <button type="submit" className="btn btn-primary" onClick={this.handleSubmit} disabled={this.state.disabledSubmit}>Submit</button>
         <button type="button" className="btn btn-primary" onClick={this.handleCancel}>Cancel</button>
       </div>
     </div>
+    <span>{this.state.errormessage}</span>
   </form>);
    }
 });
@@ -923,14 +934,14 @@ var RegistryEntryForm = React.createClass({
  */
 var FilterForm = React.createClass({
     getInitialState: function(){
-        return {name:'*',value:'*',scope:'*',confidential:'*',inheritance:false,sensitive:false,count:100,valid:true};
+        return {name:'*',value:'*',scope:'*',confidential:'*',inheritance:false,sensitive:false,count:100,valid:true,errormessage:''};
     },
     
     componentDidMount:function(){
       this.setState({count:this.props.data.count});  
     },
     onSubmitClicked:function(e){
-        e.preventDefault();
+       this.setState({errormessage:this.state.name})
         var name=this.state.name;
         var scope=this.state.scope;
         var confidential= this.state.confidential;
@@ -945,40 +956,46 @@ var FilterForm = React.createClass({
     
     onNameChange:function(e){
         var valid=true
-        this.setState({name: e.target.value,valid:valid});
+        this.setState({name: e.target.value,valid:valid},function(){this.onSubmitClicked(e)});
+       
     },
     
     onScopeChange:function(e){
-        this.setState({scope: e.target.value});
+        this.setState({scope: e.target.value},function(){this.onSubmitClicked(e)});
     },
     
     onValueChange:function(e){
-        this.setState({value: e.target.value});
+        this.setState({value: e.target.value},function(){this.onSubmitClicked(e)});
+       
     },
     
     onConfidentialChange:function(e){
-        this.setState({confidential: e.target.checked});
+        this.setState({confidential: e.target.checked},function(){this.onSubmitClicked(e)});
+        
     },
     
     onSensitiveChange:function(e){
-        this.setState({sensitive: e.target.checked});
+        this.setState({sensitive: e.target.checked},function(){this.onSubmitClicked(e)});
+        
     },
     
     onInheritanceChange:function(e){
-        this.setState({inheritance: e.target.checked});
+        this.setState({inheritance: e.target.checked},function(){this.onSubmitClicked(e)});
+       
     },
     
     onCountChange:function(e){
-        this.setState({count:e.target.value});
+        this.setState({count:e.target.value},function(){this.onSubmitClicked(e)});
+       
     },
     
     render:function(){
         return (<form>
-        <ErrorMessage>{this.state.errormessage}</ErrorMessage>
+        <span>{this.state.errormessage}</span>
           <h3>Filter Registry Entries</h3>
           <div class="form-group">
             <label for="scope">Scope</label>
-            <input type="text" placeholder="Scope" className="form-control" value={this.state.scope} onChange={this.onScopeChange} id="scope" required />
+            <input type="text" placeholder="Scope" className="form-control" value={this.state.scope} onChange={this.onScopeChange.bind(this)} id="scope" required />
           </div>
           <div class="form-group">
             <label for="name">Name:</label>
@@ -1027,15 +1044,37 @@ var FilterForm = React.createClass({
 var ConfirmationForm = React.createClass({
     render:function(){
         return (
-        <div>
+                <div className="panel panel-default">
+         <div className="panel panel-heading">
+            {this.props.header}
+         </div>
+        <div className="panel panel-body">
           {this.props.children}
           <button type="button" onClick={this.props.onSubmit} className="btn btn-primary pull-right">Submit</button>
           <button type="button" onClick={this.props.onCancel} className="btn btn-primary pull-right">Cancel</button>
+          </div>
+        <div className="panel panel-footer">
+       {this.props.footer}
+        </div>
+         
         </div>
         );
     }
 });
 
+
+
+var PanelHeader=React.createClass({
+    render:function(){
+        return <div className="panel panel-heading">{this.props.children}</div>
+    }
+});
+
+var PanelFooter=React.createClass({
+    render:function(){
+        return <div className="panel panel-footer">{this.props.children}</div>
+    }
+});
 
 
 
@@ -1072,13 +1111,28 @@ var RegistryEntryDispForm= React.createClass({
     
   render: function() {
     var confidential= this.props.data.confidential?"checked":"";  
-    return  <div>
-    Name: {this.props.data.name}<br />
-    Value: {this.props.data.value}<br />
-    entryid: {this.props.data.id}<br />
-    Confidential <input type="checkbox" checked={confidential} disabled="disabled"/>
-    <h1>Registry Entry (Read Only)</h1>
+    return <div class="form-horizontal">
+    <div class="form-group">
+    <label class="control-label col-sm-2">ID:</label>&nbsp;{this.props.data.id}
+     </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2">Name:</label>{this.props.data.name}
+    
+  </div>
+  
+  <div class="form-group">
+  <label class="control-label col-sm-2">Value:</label> {this.props.data.value}
+  
 </div>
+
+<div class="form-group">
+<label class="control-label col-sm-2">Confidential:</label>&nbsp;<input type="checkbox" checked={confidential} disabled="disabled"/>
+</div>
+</div>
+
+    
+   
+
   }
 });
 
