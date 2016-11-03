@@ -1076,8 +1076,6 @@ var PanelFooter=React.createClass({
     }
 });
 
-
-
 /*
  * This will hold a list of all registry entries that
  * are part of the same scope. A category by scope
