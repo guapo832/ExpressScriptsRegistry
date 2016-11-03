@@ -3,21 +3,29 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Custom CSS -->
-    <link href="css/custom.css" rel="stylesheet" type="text/css">
     <title>Some Title</title>
     
-<link href="Content/site.css" rel="stylesheet"/>
-<link href="Content/font-awesome-4.6.3/css/font-awesome.min.css" rel="stylesheet"/>
 
+<link href="Content/font-awesome-4.6.3/css/font-awesome.min.css" rel="stylesheet"/>
+ 
+ 
+ 
  <link rel="stylesheet" href="Content/bootstrap/3.2.0/dist/css/bootstrap.min.css">
  <link href="Content/jasny-bootstrap/css/jasny-bootstrap.min.css" rel="stylesheet"> 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="Content/bootstrap/3.2.0/dist/js/bootstrap.min.js"></script> 
   <script src="Scripts/modernizr-2.6.2.js"></script>
   <link href="Content/navmenu-reveal.css" rel="stylesheet">
-     
+     <link href="Content/site.css" rel="stylesheet"/>
+  <!-- Custom CSS -->
+ <link href="css/custom.css" rel="stylesheet" type="text/css">   
+ <!-- Fonts -->
+ <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+ <link href="https://fonts.googleapis.com/css?family=Josefin+Slab:100,300,400,600,700,100italic,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
+ 
+ 
  <script src="Content/jasny-bootstrap/js/jasny-bootstrap.min.js"></script>
 <script src="Content/bootstrap/3.2.0/dist/js/bootstrap.min.js"></script>
     <script src="http://fb.me/react-with-addons-0.12.2.js"></script> 
@@ -54,15 +62,15 @@ $(document).ready(function(){
 
 
 </script>
-    
 </head>
 <body>
-   <div class="container body-content" style="margin-top:15px">
-   <h2 style="margin-top:35px">Registry Entries</h2>
-  
+   <div class="container body-content" style="margin:auto">
+   <h2 class="brand" style="margin-top:0px">Express Script</h2>
+   <div class="address-bar">  Registry Entry Configuration </div>
+    <div class="description-bar">An application for managing registry entry configuration entries</div>
      <div style="margin-bottom:25px">
-     <button id="showCategory" class="btn btn-primary">Category View</button>
-     <button id="showflat" class="btn btn-primary">Flat View</button>
+     <button id="showCategory" class="btn btn-pink">Category View</button>
+     <button id="showflat" class="btn btn-warning">Flat View</button>
      </div> 
      <div id="registrycontainer">
       	<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
@@ -76,5 +84,5 @@ $(document).ready(function(){
  
 
     </body>
-     
+    
 </html>

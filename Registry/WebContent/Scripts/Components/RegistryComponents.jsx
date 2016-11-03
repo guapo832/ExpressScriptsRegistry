@@ -60,7 +60,7 @@ function convertData(indata){
 
 var WorkingDialog=React.createClass({
    render:function(){
-       return <div className="panel panel-default"><div className="panel panel-heading"><i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only"></span></div><div className="panel panel-body"> Working...</div></div>
+       return <div className="panel panel-default"><div className="panel panel-heading"><i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only"></span></div><div className="panel-body"> Working...</div></div>
    } 
 });
 
@@ -75,7 +75,7 @@ var Modal = React.createClass({
             transitionAppear={true} >
                     <div>
                         <div style={modalStyle}>
-                            <div style={containerStyle}>
+                            <div className="esiModal" style={containerStyle}>
                                 {this.props.children}
                             </div>
                         </div> 
@@ -155,9 +155,9 @@ var RegistryApplication = React.createClass({
           data = {scope:'',name:'',value:'',confidential:''};
           this.setState({ isModalOpen: true,
           ModalData:<div className="panel panel-default">
-              <div className="panel panel-heading"><h3>Create Entry</h3></div>
-              <div className="panel panel-body"><RegistryEntryForm onSubmit={this.addEntry} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div>
-              <div className="panel panel-footer">&nbsp;</div>
+              <div className="panel-heading"><h3>Create Entry</h3></div>
+              <div className="panel-body registryentrybody"><RegistryEntryForm onSubmit={this.addEntry} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div>
+              <div className="panel-footer">&nbsp;</div>
           </div>
               
              
@@ -462,8 +462,8 @@ var RegistryScope = React.createClass({
         e.preventDefault();
         var data={scope:this.props.scope,name:'',value:'',confidential:false};
        this.setState({ isModalOpen: true,
-       ModalData:<div className="panel panel-default"><div className="panel panel-heading"><h3>CreateEntry</h3> </div>
-              <div className="panel panel-body"><RegistryEntryForm onSubmit={this.createEntryHandler} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div><div className="panel panel-footer"></div></div>
+       ModalData:<div className="panel panel-default"><div className="panel-heading"><h3>CreateEntry</h3> </div>
+              <div className="panel-body registryentrybody"><RegistryEntryForm onSubmit={this.createEntryHandler} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div><div className="panel-footer"></div></div>
        });
        
     },
@@ -512,9 +512,9 @@ var RegistryScope = React.createClass({
        
        this.setState({ isModalOpen: true,
        ModalData:<div className="panel panel-default">
-          <div className="panel panel-heading"><h3>Copy Scope</h3></div>
-          <div className="panel panel-body"><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.scope} onSubmit={this.onHandleCopyScopeSubmit}/></div>
-          <div className="panel panel-footer"></div>
+          <div className="panel-heading"><h3>Copy Scope</h3></div>
+          <div className="panel-body registryentrybody"><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.scope} onSubmit={this.onHandleCopyScopeSubmit}/></div>
+          <div className="panel-footer"></div>
           </div>  
               
        });
@@ -684,9 +684,9 @@ var RegistryEntry = React.createClass({
     openEditEntry: function(e){
         e.preventDefault();
         this.setState({ isModalOpen: true,
-        ModalData:<div className="panel panel-default"><div className="panel panel-heading"><h3>Edit Registry Entry</h3></div>
-        <div className="panel panel-body"><RegistryEntryForm onSubmit={this.updateEntryHandler} type="PUT" url={this.props.url} onCancel={this.closeModal} data={this.state.data}/></div>
-        <div className="panel panel-footer"></div></div>
+        ModalData:<div className="panel panel-default"><div className="panel-heading"><h3>Edit Registry Entry</h3></div>
+        <div className="panel-body registryentrybody"><RegistryEntryForm onSubmit={this.updateEntryHandler} type="PUT" url={this.props.url} onCancel={this.closeModal} data={this.state.data}/></div>
+        <div className="panel-footer"></div></div>
         });
         
      },
@@ -1045,15 +1045,15 @@ var ConfirmationForm = React.createClass({
     render:function(){
         return (
                 <div className="panel panel-default">
-         <div className="panel panel-heading">
+         <div className="panel-heading">
             {this.props.header}
          </div>
-        <div className="panel panel-body">
+        <div className="panel-body registryentrybody esiModal">
           {this.props.children}
           <button type="button" onClick={this.props.onSubmit} className="btn btn-primary pull-right">Submit</button>
           <button type="button" onClick={this.props.onCancel} className="btn btn-primary pull-right">Cancel</button>
           </div>
-        <div className="panel panel-footer">
+        <div className="panel-footer">
        {this.props.footer}
         </div>
          
@@ -1095,7 +1095,7 @@ var RegistryEntryRead = React.createClass({
       
       
     return  <div id={this.props.id} className="panel-collapse collapse">
-                <div className="panel-body">
+                <div className="panel-body registryentrybody">
                     <RegistryEntryDispForm data={this.props.data} />
                 </div>
             </div>
