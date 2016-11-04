@@ -1,14 +1,83 @@
 body {
+	background: url(../img/bg.jpg);
+	background-attachment: scroll;
     padding-top: 50px;
     padding-bottom: 20px;
+    color: #fff
 }
-
+.body{
+	background: url(../img/bg.jpg);
+}
 /* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
 }
 
+.brand {      
+        display: inherit;
+        margin: 0;
+        padding: 20px 0 25px;
+        text-align: center;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        font-family: "Josefin Slab","Helvetica Neue",Helvetica,Arial,sans-serif;
+        font-size: 5em;
+        font-weight: 700;
+        line-height: normal;
+        /*color: #5f9ea0;*/
+        color:#fff;
+        }
+
+ .address-bar {
+        display: inherit;
+        margin: 0;
+        padding: 0 0 10px;
+        text-align: center;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        text-transform: uppercase;
+        font-size: 1.35em;
+        font-weight: 500;
+        letter-spacing: 3px;
+        color: 	#fff;
+        font-family: "Ubuntu", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        
+    }
+     .description-bar {
+        display: inherit;
+        margin: 0;
+        padding: 0 0 40px;
+        text-align: center;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        text-transform: uppercase;
+        font-size: 1.35em;
+        font-weight: 500;
+        letter-spacing: 3px;
+        color: 	#fff;
+        font-family: "Ubuntu", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        
+    }
+    .h4 {
+    text-transform: uppercase;
+    font-family: "Josefin Slab","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color:#fff;
+    }
+     .navmenu-default,
+	 .navbar-default .navbar-offcanvas {
+ 		 /*background-color: 	#844200; */
+ 		 background:url(../img/out.jpg);
+ 		 color:#613030;
+ 		 border-color: #e7e7e7;
+	}
+	
+	.esiModal div.panel-body{
+	color:black;
+	}
+	
+	.esiModal > div {
+	background-image:url(../img/out.jpg)
+	}
 /* Override the default bootstrap behavior where horizontal description lists 
    will truncate terms that are too long to fit in the left column 
 */
@@ -36,20 +105,60 @@ textarea {
     margin: -70px 0 0 -120px;
 
     border: 1px solid #ccc;
-    background: white;
+    background: url(../../img/out.jpg);
 }
 
 /* Animation */
-
+.btn-lightblue{color:#460046;background-color:	#fff;border-color:#fff}
+ .btn-lightblue:hover,.btn-lightblue:focus,.btn-lightblue:active,.btn-lightblue.active,.open>
+ .dropdown-toggle.btn-lightblue{color:#460046;background-color:#fff;border-color:#fff}
+ .btn-lightblue:active,.btn-lightblue.active,.open>.dropdown-toggle.btn-lightblue{background-image:none}
+ .btn-lightblue.disabled,.btn-lightblue[disabled],fieldset[disabled] .btn-lightblue,.btn-lightblue.disabled:hover,
+ .btn-lightblue[disabled]:hover,fieldset[disabled] .btn-lightblue:hover,.btn-lightblue.disabled:focus,
+ .btn-lightblue[disabled]:focus,fieldset[disabled] .btn-lightblue:focus,.btn-lightblue.disabled:active,
+ .btn-lightblue[disabled]:active,fieldset[disabled] .btn-lightblue:active,.btn-lightblue.disabled.active,
+ .btn-lightblue[disabled].active,fieldset[disabled] 
+ .btn-lightblue.active{background-color:#fff;border-color:#fff}.btn-lightblue 
+ .badge{color:#460046;background-color:#fff}
+ 
+ .btn-pink{color:#fff;background-color:#ff7575;border-color:#ff7575}
+ .btn-pink:hover,.btn-pink:focus,.btn-pink:active,.btn-pink.active,.open>
+ .dropdown-toggle.btn-pink{color:#fff;background-color:#ff7575;border-color:#ff7575}
+ .btn-pink:active,.btn-pink.active,.open>.dropdown-toggle.btn-pink{background-image:none}
+ .btn-pink.disabled,.btn-pink[disabled],fieldset[disabled] .btn-pink,.btn-pink.disabled:hover,
+ .btn-pink[disabled]:hover,fieldset[disabled] .btn-pink:hover,.btn-pink.disabled:focus,
+ .btn-pink[disabled]:focus,fieldset[disabled] .btn-pink:focus,.btn-pink.disabled:active,
+ .btn-pink[disabled]:active,fieldset[disabled] .btn-pink:active,.btn-pink.disabled.active,
+ .btn-pink[disabled].active,fieldset[disabled] 
+ .btn-pink.active{background-color:#ff7575;border-color:#ff7575}.btn-pink 
+ .badge{color:#fff;background-color:#ff7575}
+ 
+  .btn-darkblue{color:#460046;background-color:#FFFFF0;border-color:#FFFFF0}
+ .btn-darkblue:hover,.btn-darkblue:focus,.btn-darkblue:active,.btn-darkblue.active,.open>
+ .dropdown-toggle.btn-darkblue{color:#460046;background-color:#FFFFF0;border-color:#FFFFF0}
+ .btn-darkblue:active,.btn-darkblue.active,.open>.dropdown-toggle.btn-darkblue{background-image:none}
+ .btn-darkblue.disabled,.btn-darkblue[disabled],fieldset[disabled] .btn-darkblue,.btn-darkblue.disabled:hover,
+ .btn-darkblue[disabled]:hover,fieldset[disabled] .btn-darkblue:hover,.btn-darkblue.disabled:focus,
+ .btn-darkblue[disabled]:focus,fieldset[disabled] .btn-darkblue:focus,.btn-darkblue.disabled:active,
+ .btn-darkblue[disabled]:active,fieldset[disabled] .btn-darkblue:active,.btn-darkblue.disabled.active,
+ .btn-darkblue[disabled].active,fieldset[disabled] 
+ .btn-darkblue.active{background-color:#FFFFF0;border-color:#FFFFF0}.btn-darkblue 
+ .badge{color:#460046;background-color:#FFFFF0}
+ 
 .modal-enter {
   opacity: 0.01;
 }
-
+.panel-body{
+	color:#fff;
+}
 .modal-enter.modal-enter-active {
   opacity: 1;
   transition: opacity 500ms ease-in;
 }
-
+.registryentrybody{
+	color:black;
+	background-image:url(../img/out.jpg);
+}
 .modal-leave {
   opacity: 1;
 }
