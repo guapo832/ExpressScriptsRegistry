@@ -934,7 +934,7 @@ var RegistryEntryForm = React.createClass({
  */
 var FilterForm = React.createClass({
     getInitialState: function(){
-        return {name:'*',value:'*',scope:'*',confidential:'*',inheritance:false,sensitive:false,count:100,valid:true,errormessage:''};
+        return {name:'*',value:'*',scope:'*',confidential:'*',inheritance:false,sensitive:false,count:100,valid:true,errormessage:'', disabledSubmit: true};
     },
     
     componentDidMount:function(){
@@ -961,7 +961,22 @@ var FilterForm = React.createClass({
     },
     
     onScopeChange:function(e){
-        this.setState({scope: e.target.value},function(){this.onSubmitClicked(e)});
+        this.setState({scope: e.target.value,errormessage: ' ', disabledSubmit:false}, function(){//this.onSubmitClicked(e)(
+        if(this.state.scope != ''){
+        	var searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(this.state.scope) + "&confidential =*&name=*&value=*&matchCase = false";
+        	$.ajax({
+        		url: searchurl,
+        		dataType:'json',
+        		cache:false,
+        		success:function(data){
+        			if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A scope with this name already exists</ErrorMessage>,disabledSubmit:true})
+        		}.blind(this),
+        		error:function(xhr, status,err){
+        			this.setState({errormessage:status + err.toString()});
+        		}.blind(this)
+        	});
+        }
+       });
     },
     
     onValueChange:function(e){
@@ -1028,6 +1043,7 @@ var FilterForm = React.createClass({
           
           <div className="form-group row">
             <div className="offset-sm-2 col-sm-10">
+              <button type = "clear" className = "btn btn-primary pull-right" >Clear</button>
               <button type="submit" className="btn btn-primary pull-right" enabled={this.state.valid} onClick={this.onSubmitClicked} >Submit</button>
             </div>
           </div>
