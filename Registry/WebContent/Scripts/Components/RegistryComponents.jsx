@@ -60,11 +60,9 @@ function convertData(indata){
 
 var WorkingDialog=React.createClass({
    render:function(){
-<<<<<<< HEAD
-       return <div className="panel panel-default"><div className="panel panel-heading"><i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only"></span></div><div className="panel panel-body"> Working...</div></div>
-=======
+
        return <div className="panel panel-default"><div className="panel panel-heading"><i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only"></span></div><div className="panel-body"> Working...</div></div>
->>>>>>> refs/remotes/ExpressScripts/yifei
+
    } 
 });
 
@@ -159,15 +157,11 @@ var RegistryApplication = React.createClass({
           data = {scope:'',name:'',value:'',confidential:''};
           this.setState({ isModalOpen: true,
           ModalData:<div className="panel panel-default">
-<<<<<<< HEAD
-              <div className="panel panel-heading"><h3>Create Entry</h3></div>
-              <div className="panel panel-body"><RegistryEntryForm onSubmit={this.addEntry} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div>
-              <div className="panel panel-footer">&nbsp;</div>
-=======
+
               <div className="panel-heading"><h3>Create Entry</h3></div>
               <div className="panel-body registryentrybody"><RegistryEntryForm onSubmit={this.addEntry} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div>
               <div className="panel-footer">&nbsp;</div>
->>>>>>> refs/remotes/ExpressScripts/yifei
+
           </div>
               
              
@@ -472,13 +466,10 @@ var RegistryScope = React.createClass({
         e.preventDefault();
         var data={scope:this.props.scope,name:'',value:'',confidential:false};
        this.setState({ isModalOpen: true,
-<<<<<<< HEAD
-       ModalData:<div className="panel panel-default"><div className="panel panel-heading"><h3>CreateEntry</h3> </div>
-              <div className="panel panel-body"><RegistryEntryForm onSubmit={this.createEntryHandler} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div><div className="panel panel-footer"></div></div>
-=======
+
        ModalData:<div className="panel panel-default"><div className="panel-heading"><h3>CreateEntry</h3> </div>
               <div className="panel-body registryentrybody"><RegistryEntryForm onSubmit={this.createEntryHandler} type="POST" url={this.props.url} onCancel={this.closeModal} data={data}/></div><div className="panel-footer"></div></div>
->>>>>>> refs/remotes/ExpressScripts/yifei
+
        });
        
     },
@@ -527,15 +518,11 @@ var RegistryScope = React.createClass({
        
        this.setState({ isModalOpen: true,
        ModalData:<div className="panel panel-default">
-<<<<<<< HEAD
-          <div className="panel panel-heading"><h3>Copy Scope</h3></div>
-          <div className="panel panel-body"><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.scope} onSubmit={this.onHandleCopyScopeSubmit}/></div>
-          <div className="panel panel-footer"></div>
-=======
+
           <div className="panel-heading"><h3>Copy Scope</h3></div>
           <div className="panel-body registryentrybody"><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.scope} onSubmit={this.onHandleCopyScopeSubmit}/></div>
           <div className="panel-footer"></div>
->>>>>>> refs/remotes/ExpressScripts/yifei
+
           </div>  
               
        });
@@ -705,15 +692,11 @@ var RegistryEntry = React.createClass({
     openEditEntry: function(e){
         e.preventDefault();
         this.setState({ isModalOpen: true,
-<<<<<<< HEAD
-        ModalData:<div className="panel panel-default"><div className="panel panel-heading"><h3>Edit Registry Entry</h3></div>
-        <div className="panel panel-body"><RegistryEntryForm onSubmit={this.updateEntryHandler} type="PUT" url={this.props.url} onCancel={this.closeModal} data={this.state.data}/></div>
-        <div className="panel panel-footer"></div></div>
-=======
+
         ModalData:<div className="panel panel-default"><div className="panel-heading"><h3>Edit Registry Entry</h3></div>
         <div className="panel-body registryentrybody"><RegistryEntryForm onSubmit={this.updateEntryHandler} type="PUT" url={this.props.url} onCancel={this.closeModal} data={this.state.data}/></div>
         <div className="panel-footer"></div></div>
->>>>>>> refs/remotes/ExpressScripts/yifei
+
         });
         
      },
@@ -1072,26 +1055,19 @@ var ConfirmationForm = React.createClass({
     render:function(){
         return (
                 <div className="panel panel-default">
-<<<<<<< HEAD
-         <div className="panel panel-heading">
-            {this.props.header}
-         </div>
-        <div className="panel panel-body">
-=======
+
          <div className="panel-heading">
             {this.props.header}
          </div>
         <div className="panel-body registryentrybody esiModal">
->>>>>>> refs/remotes/ExpressScripts/yifei
+
           {this.props.children}
           <button type="button" onClick={this.props.onSubmit} className="btn btn-primary pull-right">Submit</button>
           <button type="button" onClick={this.props.onCancel} className="btn btn-primary pull-right">Cancel</button>
           </div>
-<<<<<<< HEAD
-        <div className="panel panel-footer">
-=======
+
         <div className="panel-footer">
->>>>>>> refs/remotes/ExpressScripts/yifei
+
        {this.props.footer}
         </div>
          
@@ -1165,13 +1141,10 @@ var RegistryEntryDispForm= React.createClass({
 
 <div class="form-group">
 <label class="control-label col-sm-2">Confidential:</label>&nbsp;<input type="checkbox" checked={confidential} disabled="disabled"/>
-<<<<<<< HEAD
+
 </div>
 </div>
-=======
-</div>
-</div>
->>>>>>> refs/remotes/ExpressScripts/yifei
+
 
     
    
