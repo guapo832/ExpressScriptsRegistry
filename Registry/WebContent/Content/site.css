@@ -1,7 +1,6 @@
 body {
-	background: url(../img/bg.jpg);
-	background-attachment: scroll;
-    padding-top: 50px;
+	background: url(../img/bg.jpg) fixed no-repeat top left;
+	padding-top: 50px;
     padding-bottom: 20px;
     color: #fff
 }

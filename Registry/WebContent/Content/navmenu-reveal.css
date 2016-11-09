@@ -18,7 +18,7 @@ html, body {
   min-height: 100%;
   padding: 50px 0 0 0;
   /* I changed the background */
-  background: url(../img/bg.jpg);
+ /* background: url(../img/bg.jpg);*/
 }
 
 @media (min-width: 0) {
