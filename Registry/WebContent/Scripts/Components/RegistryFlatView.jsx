@@ -15,6 +15,7 @@ var RegistryFlatMain= React.createClass({
 var RegistryListFlatView= React.createClass({
 
 render:function(){
+
     return(<div>
     <RegistryEntryFilterPanel>test</RegistryEntryFilterPanel>
     <h3>Component Example</h3>
@@ -38,6 +39,7 @@ render:function(){
     <tr><td>some category</td><td>some name</td><td>some value</td></tr>
     </tbody></table>
     </div>);
+
 }
 });
 
