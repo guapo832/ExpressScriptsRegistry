@@ -41,17 +41,22 @@ var modalStyle = {
         }
 
 
+
+
+
+//converts registry entry list data structure to a structure grouped by scope. then by name.
 function convertData(indata){
+    var data = indata;
     var scopeArray=[];
     var scopeAssoc={};
     var idx=0;
-    for(var i=0;i<indata.length;i++){
-        if(typeof(scopeAssoc[indata[i].scope]) == 'undefined'){
-            scopeAssoc[indata[i].scope] = idx;
-            scopeArray.push({scope:indata[i].scope,regentries:[indata[i]]});
+    for(var i=0;i<data.length;i++){
+        if(typeof(scopeAssoc[data[i].scope]) == 'undefined'){
+            scopeAssoc[data[i].scope] = idx;
+            scopeArray.push({scope:data[i].scope,regentries:[data[i]]});
             idx++;
         }else{
-            scopeArray[scopeAssoc[indata[i].scope]].regentries.push(indata[i]);
+            scopeArray[scopeAssoc[data[i].scope]].regentries.push(data[i]);
         }
     }
     return {ScopeArray:scopeArray,ScopeAssoc:scopeAssoc};
@@ -118,6 +123,34 @@ var RegistryApplication = React.createClass({
         this.getData(this.state.filterData);
      },
     
+     //sorts custom data structure by name.
+     sortByName: function(RegEntryArray){
+         return RegEntryArray.sort(function(a,b){
+             var atmp = a.name.toUpperCase();
+             var btmp = b.name.toUpperCase();
+             if(atmp < btmp) return -1;
+             if(atmp > btmp) return 1;
+             return 0;
+         });
+     },
+     
+     sortByScope:function(RegScopeArray){
+         return RegScopeArray.sort(function(a,b){
+             var atmp = a.scope.toUpperCase();
+             var btmp = b.scope.toUpperCase();
+             if(atmp < btmp) return -1;
+             if(atmp > btmp) return 1;
+             return 0;
+         });
+     },
+     
+     reIndexScopeArray:function(RegistryData){
+         for(var i=0;i<RegistryData.ScopeArray.length;i++){
+             RegistryData.ScopeAssoc[RegistryData.ScopeArray[i].scope] = i;
+         }
+         
+         return RegistryData;
+     },
      
      //get data retrieves registry entries from server
      getData:function(filterData){
@@ -136,6 +169,8 @@ var RegistryApplication = React.createClass({
               this.setState({data:convertData([]),isModalOpen:false})
               var dataMessage = data.list.length==0?<ErrorMessage>No Results Found</ErrorMessage>:''; 
               var newData = convertData(data.list);
+              newData.ScopeArray = this.sortByScope(newData.ScopeArray);
+              newData = this.reIndexScopeArray(newData);
               this.setState({data:newData,filterData:filterData,error:dataMessage,resultCount:data.totalCount,isModalOpen:false});
           }.bind(this),
           error: function(xhr, status, err) {
@@ -174,8 +209,10 @@ var RegistryApplication = React.createClass({
      copyScope: function(data,newScope){
          
          var newData = this.state.data;
-         newData.ScopeArray.push({scope:newScope,regentries:data});
-        newData.ScopeAssoc[newScope] = newData.ScopeArray.length-1;
+         newData.ScopeArray.push({scope:newScope,regentries:data}); //add to end of array
+         newData.ScopeArray = this.sortByScope(newData.ScopeArray); //sort scope array
+         newData = this.reIndexScopeArray(newData);
+        //newData.ScopeAssoc[newScope] = newData.ScopeArray.length-1;
        this.setState({data:newData,resultCount:this.state.resultCount + newData.ScopeArray.length})
      },
      
@@ -224,6 +261,12 @@ var RegistryApplication = React.createClass({
      updateEntry:function(entryData){
          
         var newData = this.state.data;
+        if(typeof(newData.ScopeAssoc[entryData.scope]) == 'undefined'){ 
+            newData.ScopeArray.push({scope:entryData.scope,regentries:[entryData]});
+            newData.ScopeArray = this.sortByScope(newData.ScopeArray);
+            newData = this.reIndexScopeArray(newData);
+        }
+        
         var regentries =  newData.ScopeArray[newData.ScopeAssoc[entryData.scope]].regentries
         for(var i = 0; i<regentries.length; i++){
             if(regentries[i].id == entryData.id){
@@ -231,6 +274,8 @@ var RegistryApplication = React.createClass({
                  break;
             }
         }
+        
+        regentries = this.sortByName(regentries);
         this.setState({data: newData,error:''});
          this.closeModal();
      },
@@ -412,7 +457,7 @@ var RegistryScopeList = React.createClass({
     
     render: function(){
         return(<div className="panel-group" id="accordion">
-        {this.props.data.ScopeArray.map(function(scopes,idx) {
+        {this.props.data.ScopeArray.map(function(scope,idx) {
               var boundCopyScope = this.handleCopyScope.bind(null,this);    
               var boundUpdateEntry = this.handleUpdateEntry.bind(null,this);
               var boundDeleteScope = this.handleDeleteScope.bind(null,this.scopes);
@@ -425,11 +470,11 @@ var RegistryScopeList = React.createClass({
                             handleAddEntry = {boundAddEntry}
                             handleDeleteScope={boundDeleteScope}
                             updateScope={boundUpdateScope}
-                            data={scopes.regentries}
+                            data={scope.regentries}
                             key={idx}
                             url={this.props.url}
                             idx={"scope" +idx}
-                            scope={scopes.scope}
+                            scope={scope.scope}
                             handleCopyScope={boundCopyScope}
                             />
                       );
@@ -735,6 +780,7 @@ var CopyScopeForm = React.createClass({
    
    handleScopeChange: function(e){
        
+
 	     this.setState({scope: e.target.value,errormessage:'',disabledSubmit:false},function(){
 	         if(this.state.scope !=''){
 	             var  searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(this.state.scope) + "&confidential=*&name=*&value=*&matchCase=false";
@@ -752,6 +798,7 @@ var CopyScopeForm = React.createClass({
 	         }
 	     });
 	   },
+
    
    handleSubmit: function(e){
       //TODO do submit
@@ -806,7 +853,7 @@ var CopyScopeForm = React.createClass({
    },
    render: function(){
       return (<form>
-      
+     
     <div className="form-group row">
       <label for="txtScope" className="col-sm-2 col-form-label">Scope</label>
       <div className="col-sm-10">
@@ -1026,15 +1073,7 @@ var FilterForm = React.createClass({
             <label><input type = "checkbox" id = "sensitive" onChange={this.onSensitiveChange} checked={this.state.sensitive} /> Case Sensitive</label>
           </div>
           </div>
-          
-          <div className="form-group row">
-            <div className="offset-sm-2 col-sm-10">
-              <button type="submit" className="btn btn-primary pull-right" enabled={this.state.valid} onClick={this.onSubmitClicked} >Submit</button>
-            </div>
-          </div>
-          </form>);
-          
-          
+      </form>);
     }
 });
 
