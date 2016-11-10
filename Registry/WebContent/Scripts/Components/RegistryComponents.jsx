@@ -549,7 +549,7 @@ var RegistryScope = React.createClass({
        
        this.setState({ isModalOpen: true,
        ModalData:<div className="panel panel-default">
-          <div className="panel-heading"><h3>Copy Scope</h3></div>
+          <div className="panel-heading"><h3>Copy {this.props.scope}</h3></div>
           <div className="panel-body registryentrybody"><CopyScopeForm onCancel={this.closeModal} url={this.props.url} scope={this.props.scope} onSubmit={this.onHandleCopyScopeSubmit}/></div>
           <div className="panel-footer"></div>
           </div>  
@@ -769,25 +769,28 @@ var CopyScopeForm = React.createClass({
       this.props.onCancel();
    },
    
+   
    handleScopeChange: function(e){
        
-     this.setState({scope: e.target.value,errormessage:<ErrorMessage>{e.target.value}</ErrorMessage>,disabledSubmit:false},function(){
-         if(this.state.scope !=''){
-             var  searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(this.state.scope) + "&confidential=*&name=*&value=*&matchCase=false";
-             $.ajax({
-                 url: searchurl,
-                 dataType: 'json',
-                 cache: false,
-                 success: function(data) {
-                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A Scope with this name already exists</ErrorMessage>,disabledSubmit:true})
-                 }.bind(this),
-                 error: function(xhr, status, err) {
-                     this.setState({errormessage:status + err.toString()});
-                 }.bind(this)
-             });
-         }
-     });
-   },
+
+	     this.setState({scope: e.target.value,errormessage:'',disabledSubmit:false},function(){
+	         if(this.state.scope !=''){
+	             var  searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(this.state.scope) + "&confidential=*&name=*&value=*&matchCase=false";
+	             $.ajax({
+	                 url: searchurl,
+	                 dataType: 'json',
+	                 cache: false,
+	                 success: function(data) {
+	                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A Scope with "{this.props.scope}" name already exists</ErrorMessage>,disabledSubmit:true})
+	                 }.bind(this),
+	                 error: function(xhr, status, err) {
+	                     this.setState({errormessage:status + err.toString()});
+	                 }.bind(this)
+	             });
+	         }
+	     });
+	   },
+
    
    handleSubmit: function(e){
       //TODO do submit
