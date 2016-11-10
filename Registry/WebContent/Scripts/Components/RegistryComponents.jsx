@@ -169,6 +169,8 @@ var RegistryApplication = React.createClass({
               this.setState({data:convertData([]),isModalOpen:false})
               var dataMessage = data.list.length==0?<ErrorMessage>No Results Found</ErrorMessage>:''; 
               var newData = convertData(data.list);
+              newData.ScopeArray = this.sortByScope(newData.ScopeArray);
+              newData = this.reIndexScopeArray(newData);
               this.setState({data:newData,filterData:filterData,error:dataMessage,resultCount:data.totalCount,isModalOpen:false});
           }.bind(this),
           error: function(xhr, status, err) {
@@ -259,6 +261,12 @@ var RegistryApplication = React.createClass({
      updateEntry:function(entryData){
          
         var newData = this.state.data;
+        if(typeof(newData.ScopeAssoc[entryData.scope]) == 'undefined'){ 
+            newData.ScopeArray.push({scope:entryData.scope,regentries:[entryData]});
+            newData.ScopeArray = this.sortByScope(newData.ScopeArray);
+            newData = this.reIndexScopeArray(newData);
+        }
+        
         var regentries =  newData.ScopeArray[newData.ScopeAssoc[entryData.scope]].regentries
         for(var i = 0; i<regentries.length; i++){
             if(regentries[i].id == entryData.id){
