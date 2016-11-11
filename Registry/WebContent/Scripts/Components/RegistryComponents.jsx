@@ -123,17 +123,6 @@ var RegistryApplication = React.createClass({
         this.getData(this.state.filterData);
      },
     
-     //sorts custom data structure by name.
-     sortByName: function(RegEntryArray){
-         return RegEntryArray.sort(function(a,b){
-             var atmp = a.name.toUpperCase();
-             var btmp = b.name.toUpperCase();
-             if(atmp < btmp) return -1;
-             if(atmp > btmp) return 1;
-             return 0;
-         });
-     },
-     
      sortByScope:function(RegScopeArray){
          return RegScopeArray.sort(function(a,b){
              var atmp = a.scope.toUpperCase();
@@ -275,7 +264,7 @@ var RegistryApplication = React.createClass({
             }
         }
         
-        regentries = this.sortByName(regentries);
+       // regentries = this.sortByName(regentries);
         this.setState({data: newData,error:''});
          this.closeModal();
      },
@@ -491,7 +480,10 @@ var RegistryScope = React.createClass({
         return { isModalOpen: false,
                ModalData:null,
                showAllLink:'',
-               data:this.props.data
+               data:this.props.data,
+               sortDirection:'Ascending',
+               sortClass:'glyphicon glyphicon-sort-by-attributes'
+               
          }; 
         
     }, 
@@ -595,14 +587,22 @@ var RegistryScope = React.createClass({
        
     },
     
-    
+ 
+    handleSort:function(e){
+        e.preventDefault();
+        
+        if(this.state.sortDirection=="Ascending"){
+            this.setState({sortDirection:"Descending",sortClass:"glyphicon glyphicon-sort-by-attributes-alt"});
+        } else {
+            this.setState({sortDirection:"Ascending",sortClass:"glyphicon glyphicon-sort-by-attributes"});
+        }
+    },
     
    render: function(){
        
        var id = this.props.idx.replace(/[\/\s]/g,'_'); //id will be used in bootstrap panels, so that each panel has a unique id.
        var datatarget= "#" + id;
-       
-       
+            
        
        return (<div className="panel panel-primary" >
         <Modal isOpen={this.state.isModalOpen} transitionName="modal-anim"> 
@@ -627,7 +627,12 @@ var RegistryScope = React.createClass({
            <span title="Create Entry in this scope" className="glyphicon glyphicon-plus"></span>
        </a> 
        {this.state.showAllLink}
-       <RegistryEntryList id={id} deleteEntryHandler={this.onHandleDeleteEntry} url={this.props.url} updateEntryHandler={this.onHandleUpdateEntry} data={this.state.data}/>
+       <a href="#" onClick={this.handleSort} className="pull-right">
+       <span title="Sort Entries" className={this.state.sortClass}></span>
+   </a> 
+      
+       
+       <RegistryEntryList id={id} deleteEntryHandler={this.onHandleDeleteEntry} url={this.props.url} updateEntryHandler={this.onHandleUpdateEntry} sort={this.state.sortDirection} data={this.state.data}/>
        
        </div>
        </div></div>);
@@ -645,7 +650,28 @@ var RegistryEntryList = React.createClass({
         
     },   
     
+    //sorts custom data structure by name.
+    sortByNameAscending: function(RegEntryArray){
+        
+        return RegEntryArray.sort(function(a,b){
+            var atmp = a.name.toUpperCase();
+            var btmp = b.name.toUpperCase();
+            if(atmp < btmp) return -1;
+            if(atmp > btmp) return 1;
+            return 0;
+        });
+    },
     
+    sortByNameDescending:function(RegEntryArray){
+        
+        return RegEntryArray.sort(function(a,b){
+            var atmp = a.name.toUpperCase();
+            var btmp = b.name.toUpperCase();
+            if(atmp > btmp) return -1;
+            if(atmp < btmp) return 1;
+            return 0;
+        });
+    },
     
     componentDidMount:function(nextprops){
         this.setState({data:this.props.data});  
@@ -658,20 +684,19 @@ var RegistryEntryList = React.createClass({
         this.props.updateEntryHandler(entryData);
     },
     render: function(){
-         var parent="accordion" + this.props.id;    
-      
-        var items = this.state.data.map(function(entry) {
+         var parent="accordion" + this.props.id; 
+         var sortedItems = this.sortByNameAscending(this.state.data);
+         if(this.props.sort=="Descending")  sortedItems = this.sortByNameDescending(this.state.data);
+        
+        var items = sortedItems.map(function(entry) {
               var boundDeleteEntry = this.handleDeleteEntry.bind(null,this.entry);
               var boundUpdateEntry = this.handleUpdateEntry.bind(null,this.entry)
               return (
                       <RegistryEntry key={entry.id} data={entry} url={this.props.url} idx={parent} handleUpdateEntry={boundUpdateEntry} handleDeleteEntry={boundDeleteEntry}/>
                       );
              },this);
-        return(
-        
-        
-        <div className="panel-group" id={parent}>
-        {items}
+        return(<div className="panel-group" id={parent}>
+          {items}
         </div>
         
       );
