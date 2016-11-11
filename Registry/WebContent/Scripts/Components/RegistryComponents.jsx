@@ -902,7 +902,15 @@ var CopyScopeForm = React.createClass({
  */
 var RegistryEntryForm = React.createClass({
     getInitialState: function(){
-        return {name:'',value:'',scope:'',confidential:'', id:0,};
+        return {
+            name:'',
+            value:'',
+            scope:'',
+            confidential:'',
+            id:0,
+            readonlyScope:''
+        }
+                
     },
     
     componentDidMount: function(){
@@ -964,14 +972,26 @@ var RegistryEntryForm = React.createClass({
        this.setState({confidential: e.target.checked});
     },
     
-    
+    enableEditScope:function(e){
+        e.preventDefault();
+        $("#scope" + this.props.id).prop("disabled",false);
+        $("#editscope" + this.props.id).hide();
+        
+    },
     
     render:function(){
+        
+        var scopeInput = <input type="text" className="form-control" onChange={this.onScopeChange} id="scope" value={this.state.scope} />
+        if (this.props.type == "PUT") {
+            scopeInput = <div>
+            <a href="#" onClick={this.enableEditScope} id={"editscope" + this.props.id}>edit scope</a>
+            <input type="text" className="form-control" onChange={this.onScopeChange} id={"scope" + this.props.id} disabled value={this.state.scope} /></div>
+        }
         return (<form>
          <div class="form-group">
             <label for="scope">Scope</label>
-            <input type="text" className="form-control" onChange={this.onScopeChange} id="scope" value={this.state.scope} />
-          </div>
+            {scopeInput}
+         </div>
           <div class="form-group">
             <label for="name">Name:</label>
             <input type="text" onChange={this.onNameChange} className="form-control" id="name" value={this.state.name} />
