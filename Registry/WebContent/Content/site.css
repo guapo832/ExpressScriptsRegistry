@@ -1,12 +1,11 @@
 body {
 	background: url(../img/11.jpg) fixed no-repeat top left;
+	background-size:cover;
 	padding-top: 50px;
     padding-bottom: 20px;
     color: #fff
 }
-.body{
-	background: url(../img/11.jpg);
-}
+
 /* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
