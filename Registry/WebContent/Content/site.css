@@ -178,13 +178,15 @@ textarea {
 }
 .registryentrybody{
 	color:black;
-	/*background-image:url(../img/out.jpg);*/
-	background-color:#fffcf1;
+	background-image:url(../img/out.jpg);
+	/*background-color:#fffcf1;*/
+	
 	padding:30px;
 }
 .registryentryheader{
 	background-color:#a3bbbb!important;
 	color:#365838!important;
+	
 	
 }
 .registryentryfooter{
@@ -192,6 +194,19 @@ textarea {
 	margin: 0;
 	padding:15px;
 }
+a {
+  color:#fcd68b;
+  text-decoration: none;
+}
+.glyphicon-plus-sign{
+
+  color: #fff!important;
+  
+  }
+.glyphicon-plus{
+	color:	#460046;
+}
+
 .panel-footer {
   background-color: #333;
 }

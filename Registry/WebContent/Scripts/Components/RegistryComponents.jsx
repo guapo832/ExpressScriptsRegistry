@@ -777,8 +777,8 @@ var RegistryEntry = React.createClass({
                     <div className="panel-heading">
                         <h4 className="panel-title">
                             <span style={collapsePanelLink}  data-toggle="collapse" data-parent={dataparent} data-target={datatarget}>{this.props.data.name}</span>
-                            <a href="#" className="pull-right" onClick={this.openEditEntry}><span title="edit entry" className="glyphicon glyphicon-edit"></span></a>&nbsp;
                             <a href="#" className="pull-right" onClick={this.confirmDeleteEntry}><span title="delete entry" className="glyphicon glyphicon-remove"></span></a>
+                            <a href="#" className="pull-right" onClick={this.openEditEntry}><span title="edit entry" className="glyphicon glyphicon-edit"></span></a>
                         </h4>
                     </div>
                             
@@ -1013,8 +1013,8 @@ var RegistryEntryForm = React.createClass({
           <div className="form-group row">
             <div className="offset-sm-2 col-sm-12">
               
-              <button type="button" className="btn btn-pink pull-right" onClick={this.props.onCancel} >Cancel</button>
-              <button type="button" className="btn btn-warning pull-right" onClick={this.onSubmitClicked} >Submit</button>
+              <button type="button" className="btn btn-warning pull-right" onClick={this.props.onCancel} >Cancel</button>
+              <button type="button" className="btn btn-pink pull-right" onClick={this.onSubmitClicked} >Submit</button>
             </div>
           </div>
           </form>);
