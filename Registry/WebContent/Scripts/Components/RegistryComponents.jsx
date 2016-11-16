@@ -23,10 +23,12 @@ var modalStyle = {
           overflowY: 'auto'
         }
 
+        
+       
         var containerStyle = {
           width: '45%',
           height:'auto',
-          position: 'relative',
+          position:'relative',
           margin: '10% auto',
           padding: '0px 0px 0px 0px',
           
@@ -69,6 +71,8 @@ var WorkingDialog=React.createClass({
    } 
 });
 
+
+
 /*Modal is used to do popup forms and dialogs */
 var Modal = React.createClass({
     render: function() {
@@ -80,7 +84,7 @@ var Modal = React.createClass({
             transitionAppear={true} >
                     <div>
                         <div style={modalStyle}>
-                            <div className="esiModal" style={containerStyle}>
+                            <div className="esiModal draggable" style={containerStyle}>
                                 {this.props.children}
                             </div>
                         </div> 
@@ -116,11 +120,14 @@ var RegistryApplication = React.createClass({
          
      }, 
      
-     
+     componentDidUpdate:function(prevProps, prevState){
+         $( ".draggable" ).draggable();
+     },
      
      componentDidMount: function(){
        
         this.getData(this.state.filterData);
+       
      },
     
      sortByScope:function(RegScopeArray){
@@ -360,7 +367,9 @@ var RegistryApplication = React.createClass({
                  {this.state.error}
                    <RegistryScopeList url={this.props.url} getScopeEntries={this.getScopeEntries} deleteEntryHandler={this.deleteEntry} addEntryHandler={this.addEntry} updateEntryHandler={this.updateEntry} deleteScopeHandler={this.deleteScope} copyScopeHandler={this.copyScope} data={this.state.data}/>
                    <Pagination getNewPage={this.newPageHandler} resultCount={this.state.resultCount} offset={this.state.filterData.offset} numEntriesPerPage={this.state.filterData.count} />
+                   
             </div>
+                   
     }
     
     
