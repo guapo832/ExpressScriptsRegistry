@@ -1047,7 +1047,10 @@ var FilterForm = React.createClass({
         
         this.props.onSubmit({name:name,value:value,scope:scope,confidential:confidential,inheritance:false,sensitive:false,count:count });
     },
-    
+    clearInput:function(e){
+    	this.setState({scope: "*", value: "*",name: "*", count:"100"},function(){this.onSubmitClicked(e)});
+    	
+    },
     
     onNameChange:function(e){
         var valid=true
@@ -1120,6 +1123,11 @@ var FilterForm = React.createClass({
             <label><input type = "checkbox" id = "sensitive" onChange={this.onSensitiveChange} checked={this.state.sensitive} /> Case Sensitive</label>
           </div>
           </div>
+          <div>
+        	<div>
+        	<button type = "button" className = "btn btn-primary pull-right" onClick = {this.clearInput}>Clear</button>
+        	</div>
+        </div>
       </form>);
     }
 });
