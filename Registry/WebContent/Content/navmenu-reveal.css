@@ -18,7 +18,11 @@ html, body {
   min-height: 100%;
   padding: 50px 0 0 0;
   /* I changed the background */
+<<<<<<< HEAD
  /* background: url(../img/bg.jpg);*/
+=======
+  background: url(../img/bg.jpg);
+>>>>>>> refs/heads/GaryBranch
 }
 
 @media (min-width: 0) {
