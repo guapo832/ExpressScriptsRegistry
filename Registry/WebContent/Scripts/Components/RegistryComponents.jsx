@@ -614,7 +614,7 @@ var RegistryScope = React.createClass({
          <span className="panel-title pull-right">
              <a href="#" onClick={this.openCopyScope}>
                  <span title="Copy Scope" className="glyphicon glyphicon-share"></span>
-             </a>
+             </a>&nbsp;
              <a href="#" onClick={this.confirmDeleteScope}>
                  <span title="delete scope" className="glyphicon glyphicon-remove"></span>
               </a>
@@ -777,9 +777,12 @@ var RegistryEntry = React.createClass({
                     <div className="panel-heading">
                         <h4 className="panel-title">
                             <span style={collapsePanelLink}  data-toggle="collapse" data-parent={dataparent} data-target={datatarget}>{this.props.data.name}</span>
-                            <a href="#" className="pull-right" onClick={this.confirmDeleteEntry}><span title="delete entry" className="glyphicon glyphicon-remove"></span></a>
-                            <a href="#" className="pull-right" onClick={this.openEditEntry}><span title="edit entry" className="glyphicon glyphicon-edit"></span></a>
-                        </h4>
+                            <span className="panel-title pull-right">
+                            
+                            <a href="#"  onClick={this.openEditEntry}><span title="edit entry" className="glyphicon glyphicon-edit"></span></a>&nbsp;
+                            <a href="#"  onClick={this.confirmDeleteEntry}><span title="delete entry" className="glyphicon glyphicon-remove"></span></a>
+                            </span>
+                            </h4>
                     </div>
                             
                             <RegistryEntryRead id={this.props.data.id} data={this.state.data} url={this.props.url}/>
