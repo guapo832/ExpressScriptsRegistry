@@ -31,33 +31,12 @@
     <script src="Scripts/react-with-addons-0.12.2.js"></script> 
  <script src="Scripts/JSXTransformer-0.12.2.js"></script> 
  <script type="text/jsx" src="Scripts/Components/RegistryComponents.jsx"></script>
-<script type="text/jsx" src="Scripts/Components/RegistryFlatView.jsx"></script>
+
 <script type="text/jsx">
 
-function showCategory() {
-	React.render(<RegistryApplication url="http://localhost:6969"/>, document.getElementById('registrycontainer'));
- 	$("#showCategory").prop('disabled', true);
-	$("#showflat").prop('disabled', false);
-}
-
-
-function showFlat(){
-    React.render(<RegistryFlatMain url="http://localhost:6969" />, document.getElementById('registrycontainer'));
-    $("#showCategory").prop('disabled', false);
-	$("#showflat").prop('disabled', true);
-}
 
 $(document).ready(function(){
-	 $("#showCategory").prop('disabled', true);
- 	 $("#showflat").click(function(event){
- 		event.preventDefault();
-		showFlat();
-	 });
-	 $("#showCategory").click(function(event){
-		event.preventDefault();
-		showCategory();
-	 });
-	 showCategory();
+	React.render(<RegistryApplication url="http://localhost:6969"/>, document.getElementById('registrycontainer'));
 });
 
 
@@ -68,10 +47,6 @@ $(document).ready(function(){
    <h2 class="brand" style="margin-top:0px">Express Script</h2>
    <div class="address-bar">  Registry Entry Configuration </div>
     <div class="description-bar">An application for managing registry entry configuration entries</div>
-     <div style="margin-bottom:25px">
-     <button id="showCategory" class="btn btn-pink">Category View</button>
-     <button id="showflat" class="btn btn-warning">Flat View</button>
-     </div> 
      <div id="registrycontainer">
       	<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
 		<span class="sr-only">Loading...</span> Loading...

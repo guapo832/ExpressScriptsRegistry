@@ -1072,7 +1072,7 @@ var FilterForm = React.createClass({
         var value = this.state.value;
         var count = this.state.count;
         
-        this.props.onSubmit({name:name,value:value,scope:scope,confidential:confidential,inheritance:false,sensitive:false,count:count });
+        this.props.onSubmit({name:name,value:value,scope:scope,confidential:confidential,inheritance:inheritance,sensitive:sensitive,count:count });
     },
     clearInput:function(e){
     	this.setState({scope: "*", value: "*",name: "*", count:"100"},function(){this.onSubmitClicked(e)});
@@ -1101,10 +1101,12 @@ var FilterForm = React.createClass({
     
     onSensitiveChange:function(e){
         this.setState({sensitive: e.target.checked},function(){this.onSubmitClicked(e)});
-        
     },
     
     onInheritanceChange:function(e){
+        
+    
+    
         this.setState({inheritance: e.target.checked},function(){this.onSubmitClicked(e)});
        
     },
