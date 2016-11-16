@@ -817,7 +817,7 @@ var CopyScopeForm = React.createClass({
 	                 dataType: 'json',
 	                 cache: false,
 	                 success: function(data) {
-	                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A Scope with "{this.props.scope}" name already exists</ErrorMessage>,disabledSubmit:true})
+	                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A Scope with "{this.state.scope}" name already exists</ErrorMessage>,disabledSubmit:true})
 	                 }.bind(this),
 	                 error: function(xhr, status, err) {
 	                     this.setState({errormessage:status + err.toString()});
@@ -912,7 +912,8 @@ var RegistryEntryForm = React.createClass({
             scope:'',
             confidential:'',
             id:0,
-            readonlyScope:''
+            readonlyScope:'',
+            errormessage: ''
         }
                 
     },
@@ -925,6 +926,28 @@ var RegistryEntryForm = React.createClass({
              confidential:this.props.data.confidential,
              value:this.props.data.value});
     },
+    
+    handleScopeChange: function(e){
+        
+
+	     this.setState({scope: e.target.value,errormessage:'',disabledSubmit:false},function(){
+	         if(this.state.scope !=''){
+	             var  searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(this.state.scope) + "&confidential=*&name=*&value=*&matchCase=false";
+	             $.ajax({
+	                 url: searchurl,
+	                 dataType: 'json',
+	                 cache: false,
+	                 success: function(data) {
+	                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A Scope with "{this.state.scope}" name already exists</ErrorMessage>,disabledSubmit:true})
+	                 }.bind(this),
+	                 error: function(xhr, status, err) {
+	                     this.setState({errormessage:status + err.toString()});
+	                 }.bind(this)
+	             });
+	         }
+	     });
+	   },
+	   
     
     onSubmitClicked:function(e){
         e.preventDefault();
@@ -985,7 +1008,7 @@ var RegistryEntryForm = React.createClass({
     
     render:function(){
         
-        var scopeInput = <input type="text" className="form-control" onChange={this.onScopeChange} id="scope" value={this.state.scope} />
+        var scopeInput = <input type="text" className="form-control" onChange={this.handleScopeChange} id="scope" value={this.state.scope} />
         if (this.props.type == "PUT") {
             scopeInput = <div>
             <a href="#" onClick={this.enableEditScope} id={"editscope" + this.props.id}>edit scope</a>
@@ -1017,9 +1040,10 @@ var RegistryEntryForm = React.createClass({
             <div className="offset-sm-2 col-sm-12">
               
               <button type="button" className="btn btn-warning pull-right" onClick={this.props.onCancel} >Cancel</button>
-              <button type="button" className="btn btn-pink pull-right" onClick={this.onSubmitClicked} >Submit</button>
+              <button type="button" className="btn btn-pink pull-right" onClick={this.onSubmitClicked} disabled={this.state.disabledSubmit}>Submit</button>
             </div>
           </div>
+           <span>{this.state.errormessage}</span>
           </form>);
           
           
@@ -1054,7 +1078,6 @@ var FilterForm = React.createClass({
     	this.setState({scope: "*", value: "*",name: "*", count:"100"},function(){this.onSubmitClicked(e)});
     	
     },
-    
     
     onNameChange:function(e){
         var valid=true
@@ -1128,10 +1151,10 @@ var FilterForm = React.createClass({
           </div>
           </div>
           <div>
-          	<div>
-          	<button type = "button" className = "btn btn-primary pull-right" onClick = {this.clearInput}>Clear</button>
-          	</div>
-          </div>
+        	<div>
+        	<button type = "button" className = "btn btn-primary pull-right" onClick = {this.clearInput}>Clear</button>
+        	</div>
+        </div>
       </form>);
     }
 });
