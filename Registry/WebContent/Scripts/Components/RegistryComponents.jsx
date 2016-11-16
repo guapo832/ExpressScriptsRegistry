@@ -1062,7 +1062,16 @@ var RegistryEntryForm = React.createClass({
  */
 var FilterForm = React.createClass({
     getInitialState: function(){
-        return {name:'*',value:'*',scope:'*',confidential:false,inheritance:false,sensitive:false,count:100,valid:true,errormessage:''};
+        return {name:'*',
+            value:'*',
+            scope:'*',
+            confidential:false,
+            inheritance:false,
+            sensitive:false,
+            count:100,
+            validation:{valid:true,errormessage:''}
+        };
+    
     },
     
     componentDidMount:function(){
@@ -1070,7 +1079,6 @@ var FilterForm = React.createClass({
     },
     onSubmitClicked:function(e){
        
-       this.setState({errormessage:this.state.name})
         var name=this.state.name;
         var scope=this.state.scope;
         var confidential= this.state.confidential;
@@ -1087,7 +1095,7 @@ var FilterForm = React.createClass({
     
     onNameChange:function(e){
         var valid=true
-        this.setState({name: e.target.value,valid:valid},function(){this.onSubmitClicked(e)});
+        this.setState({name: e.target.value,validation:{valid:valid}},function(){this.onSubmitClicked(e)});
        
     },
     
@@ -1110,21 +1118,18 @@ var FilterForm = React.createClass({
     },
     
     onInheritanceChange:function(e){
-        
-    
-    
         this.setState({inheritance: e.target.checked},function(){this.onSubmitClicked(e)});
        
     },
     
     onCountChange:function(e){
-        this.setState({count:e.target.value},function(){this.onSubmitClicked(e)});
-       
+        if(e.target.value!=''&& !isNaN(e.target.value) )
+            this.setState({count:e.target.value},function(){this.onSubmitClicked(e)});
     },
     
     render:function(){
         return (<form>
-        <span>{this.state.errormessage}</span>
+        <span>{this.state.validation.errormessage}</span>
           <h3>Filter Registry Entries</h3>
           <div class="form-group">
             <label for="scope">Scope</label>
@@ -1140,7 +1145,7 @@ var FilterForm = React.createClass({
           </div>
             
           <div class="form-group">
-            <label for="name">Max Results Per Page:</label>
+            <label for="name">Max Results Per Page:</label><span>{this.state.validation.count}</span>
             <input type="number" value={this.state.count} onChange={this.onCountChange} className="form-control" max="500" min="0" id="name" />
           </div>
             
