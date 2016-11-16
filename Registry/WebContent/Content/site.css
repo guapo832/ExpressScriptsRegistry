@@ -12,6 +12,23 @@ body {
     padding-right: 15px;
 }
 
+ 
+ .draggable, #draggable {
+    width: 100px;
+    height: 100px;
+    background: #ccc!important;
+  }
+  #droppable {
+    position: absolute;
+    left: 250px;
+    top: 0;
+    width: 125px;
+    height: 125px;
+    background: #999;
+    color: #fff;
+    padding: 10px;
+  }
+
 .brand {      
         display: inherit;
         margin: 0;
@@ -194,10 +211,7 @@ textarea {
 	margin: 0;
 	padding:15px;
 }
-a {
-  color:#fcd68b;
-  text-decoration: none;
-}
+
 .glyphicon-plus-sign{
 
   color: #fff!important;
