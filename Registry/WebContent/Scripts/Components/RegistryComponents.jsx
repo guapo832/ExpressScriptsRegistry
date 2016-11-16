@@ -143,12 +143,7 @@ var RegistryApplication = React.createClass({
      
      //get data retrieves registry entries from server
      getData:function(filterData){
-        /* this.setState({ isModalOpen: true,
-             ModalData:<WorkingDialog/>
-           });
-         */
-         
-         searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(filterData.scope) + "&confidential=" + filterData.confidential + "&name=" + encodeURIComponent(filterData.name) + "&value=" + encodeURIComponent(filterData.value) + "&useInheritance=" + filterData.inheritance + "&matchCase=" + filterData.sensitive + "&offset=" + filterData.offset + "&count=" + filterData.count;
+        searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(filterData.scope) + "&confidential=" + filterData.confidential + "&name=" + encodeURIComponent(filterData.name) + "&value=" + encodeURIComponent(filterData.value) + "&useInheritance=" + filterData.inheritance + "&matchCase=" + filterData.sensitive + "&offset=" + filterData.offset + "&count=" + filterData.count;
          $.ajax({
           url: searchurl,
           dataType: 'json',
@@ -201,7 +196,7 @@ var RegistryApplication = React.createClass({
          newData.ScopeArray.push({scope:newScope,regentries:data}); //add to end of array
          newData.ScopeArray = this.sortByScope(newData.ScopeArray); //sort scope array
          newData = this.reIndexScopeArray(newData);
-        //newData.ScopeAssoc[newScope] = newData.ScopeArray.length-1;
+        
        this.setState({data:newData,resultCount:this.state.resultCount + newData.ScopeArray.length})
      },
      
@@ -243,7 +238,7 @@ var RegistryApplication = React.createClass({
      },
      
      searchEntries:function(searchData){
-         searchData.offset = this.state.filterData.offset;
+        searchData.offset = this.state.filterData.offset;
         this.getData(searchData); 
      },
      
@@ -264,7 +259,6 @@ var RegistryApplication = React.createClass({
             }
         }
         
-       // regentries = this.sortByName(regentries);
         this.setState({data: newData,error:''});
          this.closeModal();
      },
@@ -1056,13 +1050,14 @@ var RegistryEntryForm = React.createClass({
  */
 var FilterForm = React.createClass({
     getInitialState: function(){
-        return {name:'*',value:'*',scope:'*',confidential:'*',inheritance:false,sensitive:false,count:100,valid:true,errormessage:''};
+        return {name:'*',value:'*',scope:'*',confidential:false,inheritance:false,sensitive:false,count:100,valid:true,errormessage:''};
     },
     
     componentDidMount:function(){
       this.setState({count:this.props.data.count});  
     },
     onSubmitClicked:function(e){
+       
        this.setState({errormessage:this.state.name})
         var name=this.state.name;
         var scope=this.state.scope;
@@ -1071,7 +1066,6 @@ var FilterForm = React.createClass({
         var sensitive = this.state.sensitive;
         var value = this.state.value;
         var count = this.state.count;
-        
         this.props.onSubmit({name:name,value:value,scope:scope,confidential:confidential,inheritance:inheritance,sensitive:sensitive,count:count });
     },
     clearInput:function(e){
