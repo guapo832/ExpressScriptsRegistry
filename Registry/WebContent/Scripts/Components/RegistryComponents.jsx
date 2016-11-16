@@ -75,6 +75,11 @@ var WorkingDialog=React.createClass({
 
 /*Modal is used to do popup forms and dialogs */
 var Modal = React.createClass({
+    
+    componentDidUpdate:function(prevProps, prevState){
+        $( ".draggable" ).draggable();
+    },
+    
     render: function() {
     if(this.props.isOpen){
         return (<ReactCSSTransitionGroup 
@@ -120,9 +125,7 @@ var RegistryApplication = React.createClass({
          
      }, 
      
-     componentDidUpdate:function(prevProps, prevState){
-         $( ".draggable" ).draggable();
-     },
+     
      
      componentDidMount: function(){
        
