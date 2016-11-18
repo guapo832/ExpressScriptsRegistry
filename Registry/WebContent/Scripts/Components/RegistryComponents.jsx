@@ -806,9 +806,9 @@ var CopyScopeForm = React.createClass({
    },
    
    
-   handleScopeChange: function(e){
+   handleScopeChange: function(e,x){
        
-
+	     debugger; 
 	     this.setState({scope: e.target.value,errormessage:'',disabledSubmit:false},function(){
 	         if(this.state.scope !=''){
 	             var  searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(this.state.scope) + "&confidential=*&name=*&value=*&matchCase=false";
@@ -817,7 +817,7 @@ var CopyScopeForm = React.createClass({
 	                 dataType: 'json',
 	                 cache: false,
 	                 success: function(data) {
-	                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A Scope with "{this.props.scope}" name already exists</ErrorMessage>,disabledSubmit:true})
+	                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A Scope with "{this.state.scope}" name already exists</ErrorMessage>,disabledSubmit:true})
 	                 }.bind(this),
 	                 error: function(xhr, status, err) {
 	                     this.setState({errormessage:status + err.toString()});
@@ -1093,20 +1093,20 @@ var FilterForm = React.createClass({
           <h3>Filter Registry Entries</h3>
           <div class="form-group">
             <label for="scope">Scope</label>
-            <input type="text" placeholder="Scope" className="form-control" value={this.state.scope} onChange={this.onScopeChange.bind(this)} id="scope" required />
+            <input type="text" x-webkit-speech placeholder="Scope" className="form-control" value={this.state.scope} onChange={this.onScopeChange.bind(this)} id="scope" required />
           </div>
           <div class="form-group">
             <label for="name">Name:</label>
-            <input type="text" placeholder="Name" onChange={this.onNameChange} value={this.state.name} className="form-control" id="name" />
+            <input type="text" x-webkit-speech placeholder="Name" onChange={this.onNameChange} value={this.state.name} className="form-control" id="name" />
           </div>
           <div class="form-group">
             <label for="value">Value:</label>
-            <input type="text" placeholder="Value" onChange={this.onValueChange} value={this.state.value} className="form-control" id="value" />
+            <input type="text" x-webkit-speech placeholder="Value" onChange={this.onValueChange} value={this.state.value} className="form-control" id="value" />
           </div>
             
           <div class="form-group">
             <label for="name">Max Results Per Page:</label>
-            <input type="number" value={this.state.count} onChange={this.onCountChange} className="form-control" max="500" min="0" id="name" />
+            <input type="number" x-webkit-speech value={this.state.count} onChange={this.onCountChange} className="form-control" max="500" min="0" id="name" />
           </div>
             
           <hr />
