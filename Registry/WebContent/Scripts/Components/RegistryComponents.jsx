@@ -1038,7 +1038,8 @@ var RegistryEntryForm = React.createClass({
             confidential:'',
             id:0,
             readonlyScope:'',
-            errormessage: ''
+            errormessage: '',
+            disabledSubmit: "disabled"
         }
                 
     },
@@ -1055,24 +1056,51 @@ var RegistryEntryForm = React.createClass({
     handleScopeChange: function(e){
         
 
-	     this.setState({scope: e.target.value,errormessage:'',disabledSubmit:false},function(){
-	         if(this.state.scope !=''){
-	             var  searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(this.state.scope) + "&confidential=*&name=*&value=*&matchCase=false";
+	     this.setState({scope: e.target.value,errormessage:'',disabledSubmit:""},function(){
+	         if(this.state.scope !='' && this.state.name!=''){
+	        	 var  searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(this.state.scope) + "&confidential=*&name="+encodeURIComponent(this.state.name)+"&value=*&matchCase=false";
+
 	             $.ajax({
 	                 url: searchurl,
 	                 dataType: 'json',
 	                 cache: false,
 	                 success: function(data) {
-	                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A Scope with "{this.state.scope}" name already exists</ErrorMessage>,disabledSubmit:true})
+	                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>A Scope with "{this.state.scope}" name already exists</ErrorMessage>,disabledSubmit:"disabled"})
 	                 }.bind(this),
 	                 error: function(xhr, status, err) {
 	                     this.setState({errormessage:status + err.toString()});
 	                 }.bind(this)
 	             });
 	         }
+	         else{
+	        	 this.setState({disabledSubmit:"disabled"});
+	         }
 	     });
 	   },
-	   
+	   handleNameChange: function(e){
+	        
+
+		     this.setState({name: e.target.value,errormessage:'',disabledSubmit:""},function(){
+		         if(this.state.name !='' && this.state.scope != ''){
+		             var  searchurl = this.props.url + "/registryEntry?scope=" + encodeURIComponent(this.state.scope) + "&confidential=*&name="+encodeURIComponent(this.state.name)+"&value=*&matchCase=false";
+
+		             $.ajax({
+		                 url: searchurl,
+		                 dataType: 'json',
+		                 cache: false,
+		                 success: function(data) {
+		                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>Entry "{this.state.name}" already exists</ErrorMessage>,disabledSubmit:"disabled"})
+		                 }.bind(this),
+		                 error: function(xhr, status, err) {
+		                     this.setState({errormessage:status + err.toString()});
+		                 }.bind(this)
+		             });
+		         }
+		         else{
+		        	 this.setState({disabledSubmit:"disabled"});
+		         }
+		     });
+		   },
     
     onSubmitClicked:function(e){
         e.preventDefault();
@@ -1146,7 +1174,7 @@ var RegistryEntryForm = React.createClass({
          </div>
           <div class="form-group">
             <label for="name">Name:</label>
-            <input type="text" onChange={this.onNameChange} className="form-control" id="name" value={this.state.name} />
+            <input type="text" onChange={this.handleNameChange} className="form-control" id="name" value={this.state.name} />
           </div>
           <div class="form-group">
             <label for="value">Value:</label>
@@ -1165,7 +1193,7 @@ var RegistryEntryForm = React.createClass({
             <div className="offset-sm-2 col-sm-12">
               
               <button type="button" className="btn btn-warning pull-right" onClick={this.props.onCancel} >Cancel</button>
-              <button type="button" className="btn btn-pink pull-right" onClick={this.onSubmitClicked} disabled={this.state.disabledSubmit}>Submit</button>
+              <button type="button" className="btn btn-pink pull-right" onClick={this.onSubmitClicked} disabled ={this.state.disabledSubmit}>Submit</button>
             </div>
           </div>
            <span>{this.state.errormessage}</span>
