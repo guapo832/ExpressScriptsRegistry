@@ -49,7 +49,7 @@ $(document).ready(function(){
 </head>
 <body>
  <div class="container body-content" style="margin:auto">
-   <h2 class="brand" style="margin-top:0px">Express Script</h2>
+   <h2 class="brand" style="margin-top:0px">Express Scripts</h2>
    <div class="address-bar">  Registry Entry Configuration </div>
     <div class="description-bar">An application for managing registry entry configuration entries</div>
      <div id="registrycontainer">
@@ -57,8 +57,26 @@ $(document).ready(function(){
 		<span class="sr-only">Loading...</span> Loading...
     </div>
   </div>
+<div class="registryscopeDropable" style="width:1024px;height:40px;border:1px solid black">test</div>
+ <script>
 
- 
+/*
+ $( ".registryscopeDropable" ).droppable({
+
+     drop: function( event, ui ) {
+       alert('testin2')
+       $( this )
+         .addClass( "ui-state-highlight" );
+         alert('dropped');
+     },
+     over: function( event, ui ) {
+         alert('test')
+        $(this).addClass( "ui-state-highlight" );
+     }
+
+   });
+*/
+ </script>
 
  
 </body>
