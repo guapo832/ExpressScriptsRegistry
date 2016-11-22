@@ -836,16 +836,20 @@ var RegistryEntry = React.createClass({
      }, 
      
      componentDidUpdate:function(prevProps, prevState){
-         
-         $("#" + "draggable_" + this.props.data.id  ).draggable({
+       
+        $("#" + "draggable_" + this.props.data.id  ).draggable({
          revert : true
          });
-         $( ".registryscopeDropable" ).droppable( "option", "accept", ".dragableValid" );
+         //$( ".registryscopeDropable" ).droppable( "option", "accept", ".dragableValid" );
      },
 
      
      componentDidMount:function(){
         this.setState({data:this.props.data});  
+        $("#" + "draggable_" + this.props.data.id  ).draggable({
+            revert : true
+            });
+            $( ".registryscopeDropable" ).droppable( "option", "accept", ".dragableValid" );
      },
      openModal: function() { 
          this.setState({ isModalOpen: true }); 
