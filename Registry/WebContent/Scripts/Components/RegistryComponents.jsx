@@ -1123,7 +1123,7 @@ var RegistryEntryForm = React.createClass({
 		                     if(data.totalCount>0) this.setState({errormessage:<ErrorMessage>Entry "{this.state.name}" already exists</ErrorMessage>,disabledSubmit:"disabled"})
 		                 }.bind(this),
 		                 error: function(xhr, status, err) {
-		                     this.setState({errormessage:status + err.toString()});
+		                     this.setState({errormessage:<ErrorMessage>An an unexpected error has occurred: {xhr.statusText}</ErrorMessage>});
 		                 }.bind(this)
 		             });
 		         }
@@ -1156,8 +1156,7 @@ var RegistryEntryForm = React.createClass({
                  this.props.onSubmit(data);
              }.bind(this),
              error: function(xhr, status, err) {
-                 this.setState(err)
-                 alert(status);
+                 this.setState({errormessae:<ErrorMessage>{xhr.statusText}</ErrorMessage>});
                  console.error(murl, status, err.toString());
              }.bind(this)
            });
